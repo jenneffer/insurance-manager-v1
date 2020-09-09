@@ -35,7 +35,7 @@
                     @foreach($insurances as $key => $ins) 
                     <tr data-entry-id="{{ $ins->id }}">
                         <td></td>
-                        <td>{{$ins->ins_agent}}</td>
+                        <td>{{$ins->agent->agentDesc}}</td>
                         <td>{{$ins->company->compCode ?? '' }}</td>
                         <td>{{$ins->ins_policy_no}}</td>
                         <td>{{$ins->ins_date_start}} to <br>{{$ins->ins_date_end}}</td>

@@ -102,7 +102,11 @@ $tabContent = "<div class='row form-group'>
             <div class="row form-group">
                 <div class="col-sm-3">
                     <label for="title">Insurance Agent <span style="color:red;">*</span></label>
-                    <input type="text" class="form-control" name="ins_agent" id="ins_agent" value="{{ old('ins_agent', isset($insurance) ? $insurance->ins_agent : '') }}">   
+                    <select name="ins_agent" id="ins_agent" class="form-control select2">
+                        @foreach($agent as $id => $ag)
+                            <option value="{{ $id }}" {!! old('ins_agent', $insurance->ins_agent) == $id ? 'selected="selected"' : '' !!}>{{ $ag }}</option>
+                        @endforeach
+                    </select>  
                 </div>
                 <div class="col-sm-3 {{ $errors->has('company_id') ? 'has-error' : '' }}">
                     <label for="company">Policy Holder <span style="color:red;">*</span></label>
@@ -446,7 +450,10 @@ $tabContent = "<div class='row form-group'>
     $(document).ready(function(){    
 
         //initialize select
-        var select2 = $(".select2").select2({
+        var select_agent = $("#ins_agent").select2({
+            selectOnClose: true
+        });
+        var select_comp = $("#company_id").select2({
             selectOnClose: true
         });
         //insurance id 
@@ -456,8 +463,10 @@ $tabContent = "<div class='row form-group'>
         //get the highest tab index
         var highest_index = {!! json_encode($highest_index) !!};
 
-        select2.data('select2').$selection.css('height', '35px');
-        select2.data('select2').$selection.css('border', '1px solid #e4e7ea');     
+        select_agent.data('select2').$selection.css('height', '35px');
+        select_agent.data('select2').$selection.css('border', '1px solid #e4e7ea');     
+        select_comp.data('select2').$selection.css('height', '35px');
+        select_comp.data('select2').$selection.css('border', '1px solid #e4e7ea');    
 
         //get the default first row        
         tabCounter = highest_index+1;        

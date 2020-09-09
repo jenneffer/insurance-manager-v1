@@ -254,6 +254,54 @@ class PermissionsTableSeeder extends Seeder
                 'created_at' => '2019-09-13 19:21:30',
                 'updated_at' => '2019-09-13 19:21:30',
             ],
+            [
+                'id'         => '42',
+                'title'      => 'attachment_access',
+                'created_at' => '2019-09-13 19:21:30',
+                'updated_at' => '2019-09-13 19:21:30',
+            ],
+            [
+                'id'         => '43',
+                'title'      => 'attachment_create',
+                'created_at' => '2019-09-13 19:21:30',
+                'updated_at' => '2019-09-13 19:21:30',
+            ],
+            [
+                'id'         => '44',
+                'title'      => 'attachment_delete',
+                'created_at' => '2019-09-13 19:21:30',
+                'updated_at' => '2019-09-13 19:21:30',
+            ],
+            [
+                'id'         => '45',
+                'title'      => 'agent_delete',
+                'created_at' => '2019-09-13 19:21:30',
+                'updated_at' => '2019-09-13 19:21:30',
+            ],
+            [
+                'id'         => '46',
+                'title'      => 'agent_access',
+                'created_at' => '2019-09-13 19:21:30',
+                'updated_at' => '2019-09-13 19:21:30',
+            ],
+            [
+                'id'         => '47',
+                'title'      => 'agent_create',
+                'created_at' => '2019-09-13 19:21:30',
+                'updated_at' => '2019-09-13 19:21:30',
+            ],
+            [
+                'id'         => '48',
+                'title'      => 'agent_show',
+                'created_at' => '2019-09-13 19:21:30',
+                'updated_at' => '2019-09-13 19:21:30',
+            ],
+            [
+                'id'         => '49',
+                'title'      => 'agent_edit',
+                'created_at' => '2019-09-13 19:21:30',
+                'updated_at' => '2019-09-13 19:21:30',
+            ],
         ];
 
         Permission::insert($permissions);

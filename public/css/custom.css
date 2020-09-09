@@ -36,14 +36,14 @@ table.dataTable thead th {
     border-bottom: 1px solid #c8ced3;
 }
 
-.select2 {
+/*.select2 {
     max-width: 100%;
     width: 100% !important;
 }
 
 .select2-selection__rendered {
     padding-bottom: 5px !important;
-}
+}*/
 
 .has-error .invalid-feedback {
     display: block !important;
@@ -102,10 +102,10 @@ table.dataTable thead .sorting_desc {
     cursor: pointer;
     background: #eaeaea;
 }
-.select2-results__option {
+/*.select2-results__option {
     padding-left: 0px;
     padding-right: 0px;
-}
+}*/
 .color-red {
     color: red;
 }
@@ -148,6 +148,22 @@ table.dataTable thead .sorting_desc {
 .insurance-font{
     font-size: 12px;
 }
+
+.lightbox{
+      z-index: 1041;
+}
+
+.small-img{
+  width: 100px;height: 100px;
+}
+
+.select2-selection__rendered {
+  margin: 5px;
+}
+.select2-selection__arrow {
+  margin: 5px;
+}
+
 
 
 

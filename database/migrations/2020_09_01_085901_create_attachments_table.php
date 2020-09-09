@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRiskTable extends Migration
+class CreateAttachmentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,10 @@ class CreateRiskTable extends Migration
      */
     public function up()
     {
-        Schema::create('risk', function (Blueprint $table) {
-            $table->increments('id');
+        Schema::create('attachments', function (Blueprint $table) {
+            $table->bigIncrements('id');
             $table->integer('ins_id');
-            $table->integer('risk_riskno');
-            $table->string('risk_location', 100);
-            $table->text('risk_address');
-            $table->text('risk_description');
-            $table->text('risk_construction_code');
-            $table->text('risk_remark')->nullable();
+            $table->string('file_path');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -34,6 +29,6 @@ class CreateRiskTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('risk');
+        Schema::dropIfExists('attachments');
     }
 }

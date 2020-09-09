@@ -42,4 +42,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     //perils
     Route::post('insurance/perils/destroy', 'PerilsController@destroy')->name('perils.destroy');
 
+    //attachment
+     Route::delete('attachments/destroy', 'AttachmentController@massDestroy')->name('attachments.massDestroy');     
+     Route::resource('attachments', 'AttachmentController');
+
+     //agent
+    Route::delete('agents/destroy', 'AgentController@massDestroy')->name('agents.massDestroy');
+    Route::resource('agents', 'AgentController');
+
 });

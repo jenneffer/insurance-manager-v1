@@ -44,6 +44,16 @@
                     </ul>
                 </li>
             @endcan
+            @can('agent_access')
+                <li class="nav-item">
+                    <a href="{{ route("admin.agents.index") }}" class="nav-link {{ request()->is('admin/agents') || request()->is('admin/agents/*') ? 'active' : '' }}">
+                        <i class="fa-fw fas fa-user-tie nav-icon">
+
+                        </i>
+                        Agent
+                    </a>
+                </li>
+            @endcan
             @can('company_access')
                 <li class="nav-item">
                     <a href="{{ route("admin.companies.index") }}" class="nav-link {{ request()->is('admin/companies') || request()->is('admin/companies/*') ? 'active' : '' }}">
@@ -64,6 +74,16 @@
                     </a>
                 </li>
             @endcan
+            @can('attachment_access')
+                <li class="nav-item">
+                    <a href="{{ route("admin.attachments.index") }}" class="nav-link {{ request()->is('admin/attachments') || request()->is('admin/attachments/*') ? 'active' : '' }}">
+                        <i class="fa-fw fas fa-paperclip nav-icon">
+
+                        </i>
+                        Attachment
+                    </a>
+                </li>
+            @endcan            
             <li class="nav-item">
                 <a href="#" class="nav-link" onclick="event.preventDefault(); document.getElementById('logoutform').submit();">
                     <i class="nav-icon fas fa-fw fa-sign-out-alt">

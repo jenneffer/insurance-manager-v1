@@ -102,7 +102,11 @@ $tabContent = "<div class='row form-group'>
             <div class="row form-group">
                 <div class="col-sm-3">
                     <label for="title">Insurance Agent <span style="color:red;">*</span></label>
-                    <input type="text" class="form-control" name="ins_agent" id="ins_agent" required="required">   
+                    <select name="ins_agent" id="ins_agent" class="form-control select2" required="required">
+                        @foreach($agent as $id => $ag)
+                            <option value="{{ $id }}" >{{ $ag }}</option>
+                        @endforeach
+                    </select>   
                 </div>
                 <div class="col-sm-3 {{ $errors->has('company_id') ? 'has-error' : '' }}">
                     <label for="company">Policy Holder <span style="color:red;">*</span></label>
@@ -176,7 +180,7 @@ $tabContent = "<div class='row form-group'>
                 <div class="col-sm-6">
                     <label for="ins_remark">Remarks</label>
                     <textarea name="ins_remark" id="ins_remark" class="form-control" rows="2" cols="40"></textarea>
-                </div>                 
+                </div>                                    
             </div>
 
             <!-- Insurance add risk tab -->
@@ -193,6 +197,7 @@ $tabContent = "<div class='row form-group'>
             </div>
             
             <!-- save form-->
+            <br>
             <div style="text-align: center;">
                 <input class="btn btn-danger" type="submit" value="{{ trans('global.save') }}">
             </div>
@@ -209,12 +214,18 @@ $tabContent = "<div class='row form-group'>
     $(document).ready(function(){    
 
         //initialize select
-        var select2 = $(".select2").select2({
+        var select_agent = $("#ins_agent").select2({
+            selectOnClose: true
+        });
+        var select_company = $("#company_id").select2({
             selectOnClose: true
         });
         
-        select2.data('select2').$selection.css('height', '35px');
-        select2.data('select2').$selection.css('border', '1px solid #e4e7ea');     
+        select_company.data('select2').$selection.css('height', '35px');
+        select_company.data('select2').$selection.css('border', '1px solid #e4e7ea');    
+
+        select_agent.data('select2').$selection.css('height', '35px');
+        select_agent.data('select2').$selection.css('border', '1px solid #e4e7ea');  
 
         //get the default first row        
         tabCounter = 1;        
@@ -259,11 +270,11 @@ $tabContent = "<div class='row form-group'>
             var insuranceData = $('#insuranceForm').serialize();
             $.ajax({
                 url: "/admin/insurance/add",
-                type:"POST",                
+                type:"POST",               
                 data:{
                     "_token": "{{ csrf_token() }}",
                     data: insuranceData                    
-                },
+                },                
                 success:function(response){
                     window.location=response.url;
                 },

@@ -12,4 +12,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', '
 
     // Insurance-20200803 by Jenn
     Route::apiResource('insurances', 'InsuranceApiController');
+
+    //attachment
+    Route::apiResource('attachments', 'AttachmentApiController');
 });

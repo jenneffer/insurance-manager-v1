@@ -36,8 +36,4 @@ class InterestInsured extends Model
         $this->attributes['entry_date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
     }
 
-    public function created_by()
-    {
-        return $this->belongsTo(User::class, 'created_by_id');
-    }
 }

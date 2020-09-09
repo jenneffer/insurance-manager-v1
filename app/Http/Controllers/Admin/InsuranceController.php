@@ -8,6 +8,7 @@ use App\InterestInsured;
 use App\Perils;
 use App\ExpenseCategory;
 use App\Company;
+use App\Agent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyInsuranceRequest;
 use App\Http\Requests\StoreInsuranceRequest;
@@ -31,9 +32,11 @@ class InsuranceController extends Controller
     {
         abort_if(Gate::denies('insurance_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $company = Company::all()->pluck('compDesc', 'id')->prepend(trans('global.pleaseSelect'), '');        
+        $company = Company::all()->pluck('compDesc', 'id')->prepend(trans('global.pleaseSelect'), '');   
 
-        return view('admin.insurances.create', compact('company'));
+        $agent = Agent::all()->pluck('agentDesc', 'id')->prepend(trans('global.pleaseSelect'), '');      
+
+        return view('admin.insurances.create', compact('company','agent'));
     }
 
     public function store(StoreInsuranceRequest $request)
@@ -41,7 +44,7 @@ class InsuranceController extends Controller
         $data = $request->all(); //form data
         $param = array();
         parse_str($data['data'], $param); //unserialize jquery string data  
-        
+
         //insert into insurance table       
         $token = $param['_token'];
         $insurance_table = [
@@ -133,8 +136,10 @@ class InsuranceController extends Controller
         abort_if(Gate::denies('insurance_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $company = Company::all()->pluck('compDesc', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $agent = Agent::all()->pluck('agentDesc', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $insurance->load('company', 'created_by');
+        $insurance->load('agent', 'created_by');
         $risk = DB::table('risk')->where('ins_id', '=', $insurance->id)->get();
                  
         $interest_insured = [];
@@ -150,7 +155,7 @@ class InsuranceController extends Controller
          //get the lowest and highest tab index  
          $lowest_index = min($arr_risk_id);
          $highest_index = max($arr_risk_id);
-        return view('admin.insurances.edit', compact('company', 'insurance','risk','perils','interest_insured','risk_count','lowest_index','highest_index'));
+        return view('admin.insurances.edit', compact('company','agent', 'insurance','risk','perils','interest_insured','risk_count','lowest_index','highest_index'));
     }
 
     public function update(UpdateInsuranceRequest $request, Insurance $insurance)

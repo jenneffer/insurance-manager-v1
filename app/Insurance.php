@@ -1,7 +1,6 @@
 <?php
 
 namespace App;
-
 use App\Traits\MultiTenantModelTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -44,6 +43,11 @@ class Insurance extends Model
     public function company()
     {
         return $this->belongsTo(Company::class, 'ins_company');       
+    }
+
+    public function agent()
+    {
+        return $this->belongsTo(Agent::class, 'ins_agent');   
     }
 
     public function getEntryDateAttribute($value)

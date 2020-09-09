@@ -98,7 +98,7 @@ class CompanyTableSeeder extends Seeder
                 'updated_at'     => Carbon::now(),
             ],
         ];
-
+        
         Company::insert($company);
     }
 }

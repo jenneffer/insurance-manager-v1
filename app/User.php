@@ -54,25 +54,6 @@ class User extends Authenticatable
         });
     }
 
-    public function expenseCategories()
-    {
-        return $this->hasMany(ExpenseCategory::class, 'created_by_id', 'id');
-    }
-
-    public function incomeCategories()
-    {
-        return $this->hasMany(IncomeCategory::class, 'created_by_id', 'id');
-    }
-
-    public function expenses()
-    {
-        return $this->hasMany(Expense::class, 'created_by_id', 'id');
-    }
-
-    public function incomes()
-    {
-        return $this->hasMany(Income::class, 'created_by_id', 'id');
-    }
 
     public function getEmailVerifiedAtAttribute($value)
     {
