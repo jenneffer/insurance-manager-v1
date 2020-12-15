@@ -2,41 +2,70 @@
 @section('content')
 <?php 
 $tabContent = "<div class='row form-group'>
-                    <div class='col-sm-6'>
+                    <div class='col-sm-3'>
                         <label for='risk_location'>Location <span style='color:red;'>*</span></label>
                         <input name='risk_location[{index}]' class='form-control'>
                     </div>
-                    <div class='col-sm-6'>
+                    <div class='col-sm-3'>
                         <label for='risk_address'>Address <span style='color:red;'>*</span></label>
                         <input name='risk_address[{index}]' class='form-control'>
-                    </div>                              
-                </div>
-                <hr>
-                <label><b>Properties Insured</b></label>
-                <div class='row form-group'>
-                    <div class='col-sm-6'>
-                        <label for='properties_insured'>Description<span style='color:red;'>*</span></label>
-                        <textarea name='properties_insured[{index}]' class='form-control' row='5'/>
                     </div>
+                    <div class='col-sm-3'>
+                        <label for='risk_description'>Occupation/BTC & Description <span style='color:red;'>*</span></label>
+                        <input name='risk_description[{index}]' class='form-control'>
+                    </div>   
+                    <div class='col-sm-3'>
+                        <label for='risk_construction_code'>Construction Code & Description <span style='color:red;'>*</span></label>
+                        <input name='risk_construction_code[{index}]' class='form-control'>
+                    </div>           
                 </div>
                 <hr>
-                <label><b>Additional items</b></label>
+                <label><b>Interest Insured</b></label>
                 <div class='row form-group'>
                     <div class='col-sm-2'>
                         <label for='ins_item_no'>Item No.<span style='color:red;'>*</span></label>
+                        <input name='ins_item_no[{index}]' class='form-control'>
+                    </div>
+                    <div class='col-sm-7'>
+                        <label for='ins_desc'>Interest Description<span style='color:red;'>*</span></label>
+                        <input name='ins_desc[{index}]' class='form-control'>
+                    </div>   
+                    <div class='col-sm-2'>
+                        <label for='ins_sum_insured'>Sum Insured (RM) <span style='color:red;'>*</span></label>
+                        <input name='ins_sum_insured[{index}]' class='form-control'>
+                    </div>
+                    <div class='col-sm-1 text-right'>                        
+                        <input class='btn btn-info btn_interest_insured' name='btn_interest_insured[{index}]' type='button' value='Add'>
+                    </div>
+                </div>
+                <div class='col-sm-12'>
+                    <table class='table table-sm' id='interest_table[{index}]'>
+                        <thead>
+                            <tr>
+                                <th>Item No.</th>
+                                <th>Interest Description</th>
+                                <th>Sum Insured (RM)</th>
+                                <th>&nbsp;</th>                                
+                            </tr>
+                        </thead>
+                        <tbody>                            
+                        </tbody>
+                    </table>
+                </div>
+                <hr>
+                <label><b>Perils/Extensions/Clauses/Warranties/Memorandum</b></label>
+                <div class='row form-group'>
+                    <div class='col-sm-2'>
+                        <label for='ins_code'>Code<span style='color:red;'>*</span></label>
                         <input name='ins_code[{index}]' class='form-control'>
                     </div>
-                    <div class='col-sm-6'>
+                    <div class='col-sm-7'>
                         <label for='ins_desc_perils'>Description<span style='color:red;'>*</span></label>
                         <input name='ins_desc_perils[{index}]' class='form-control'>
                     </div>   
-                    <div class='col-sm-1'>
+                    <div class='col-sm-2'>
                         <label for='ins_rate'>Rate (%)<span style='color:red;'>*</span></label>
                         <input name='ins_rate[{index}]' class='form-control'>
-                    </div>
-                    <div class='col-sm-2'>
-                        <label for='ins_sum_insured'>Sum Insured (RM)<span style='color:red;'>*</span></label>
-                        <input name='ins_sum_insured[{index}]' class='form-control'>
                     </div>
                     <div class='col-sm-1 text-right'>                        
                         <input class='btn btn-info btn_perils' name='btn_perils[{index}]' type='button' value='Add'>
@@ -46,10 +75,10 @@ $tabContent = "<div class='row form-group'>
                     <table class='table table-sm' id='perils_table[{index}]'>
                         <thead>
                             <tr>
-                                <th>Item No.</th>
+                                <th>Code</th>
                                 <th>Description</th>
-                                <th style='text-align:right;'>Rate (%)</th>
-                                <th style='text-align:right;'>Sum Insured (RM)</th>                                
+                                <th>Rate (%)</th>
+                                <th>&nbsp;</th>                                
                             </tr>
                         </thead>
                         <tbody>                            
@@ -93,7 +122,7 @@ $tabContent = "<div class='row form-group'>
                     @endif
                 </div>
                 <div class="col-sm-3">
-                    <label for="ins_class">Class of Insurance <span style="color:red;">*</span></label>
+                    <label for="ins_class">Product <span style="color:red;">*</span></label>
                     <input name="ins_class" id="ins_class" class="form-control" required="required">
                 </div>
                 <div class="col-sm-3">
@@ -188,7 +217,7 @@ $tabContent = "<div class='row form-group'>
 @endsection
 @section('scripts')
 <script type="text/javascript">
-    // var TABLE_INTEREST_DATA = [];
+    var TABLE_INTEREST_DATA = [];
     var TABLE_PERILS_DATA = [];
     $(document).ready(function(){    
 
@@ -211,12 +240,12 @@ $tabContent = "<div class='row form-group'>
         addTab();
 
         var tabs = $( "#tabs" ).tab();
-        // $("form[name=insuranceForm]").on( 'click', "input.btn_interest_insured", function(event) {
-        //     var name = $(this).attr('name');
-        //     var number_matches = name.match(/[0-9]+/g);
-        //     var index = number_matches[0];             
-        //     addRowInterest(index);                             
-        // });
+        $("form[name=insuranceForm]").on( 'click', "input.btn_interest_insured", function(event) {
+            var name = $(this).attr('name');
+            var number_matches = name.match(/[0-9]+/g);
+            var index = number_matches[0];             
+            addRowInterest(index);                             
+        });
 
         $("form[name=insuranceForm]").on( 'click', "input.btn_perils", function(event) {
             var name = $(this).attr('name');
@@ -244,7 +273,7 @@ $tabContent = "<div class='row form-group'>
         //submit form
         $('#insuranceForm').on('submit',function(event){           
             event.preventDefault();
-            // $("#interest_insured").val(JSON.stringify(TABLE_INTEREST_DATA));
+            $("#interest_insured").val(JSON.stringify(TABLE_INTEREST_DATA));
             $("#perils").val(JSON.stringify(TABLE_PERILS_DATA));
             var insuranceData = $('#insuranceForm').serialize();
             $.ajax({
@@ -260,41 +289,39 @@ $tabContent = "<div class='row form-group'>
             });
         });    
 
-        // function addRowInterest(index){  
-        //     var indexInterestObj = {};         
-        //     var item_no = $("input[name=ins_item_no\\["+index+"\\]]").val();
-        //     var desc = $("input[name=ins_desc\\["+index+"\\]]").val();
-        //     var sum_insured = $("input[name=ins_sum_insured\\["+index+"\\]]").val();
-        //     var currentInterestData = new interestData(item_no, desc, sum_insured);
-        //     indexInterestObj[index] = currentInterestData;
-        //     TABLE_INTEREST_DATA.push(indexInterestObj);
+        function addRowInterest(index){  
+            var indexInterestObj = {};         
+            var item_no = $("input[name=ins_item_no\\["+index+"\\]]").val();
+            var desc = $("input[name=ins_desc\\["+index+"\\]]").val();
+            var sum_insured = $("input[name=ins_sum_insured\\["+index+"\\]]").val();
+            var currentInterestData = new interestData(item_no, desc, sum_insured);
+            indexInterestObj[index] = currentInterestData;
+            TABLE_INTEREST_DATA.push(indexInterestObj);
  
-        //     var markup = "<tr><td>"+item_no+"</td><td>"+desc+"</td><td>"+sum_insured+"</td></tr>";
-        //     $("#interest_table\\["+index+"\\] tbody").append(markup);
+            var markup = "<tr><td>"+item_no+"</td><td>"+desc+"</td><td>"+sum_insured+"</td></tr>";
+            $("#interest_table\\["+index+"\\] tbody").append(markup);
             
-        //     //clear input fields after populated in the table
-        //     $("input[name=ins_item_no\\["+index+"\\]]").val('');
-        //     $("input[name=ins_desc\\["+index+"\\]]").val('');
-        //     $("input[name=ins_sum_insured\\["+index+"\\]]").val('');                
-        // }
+            //clear input fields after populated in the table
+            $("input[name=ins_item_no\\["+index+"\\]]").val('');
+            $("input[name=ins_desc\\["+index+"\\]]").val('');
+            $("input[name=ins_sum_insured\\["+index+"\\]]").val('');                
+        }
         function addRowPerils(index){   
             var indexPerilsObj = {};           
             var code = $("input[name=ins_code\\["+index+"\\]]").val();
             var desc = $("input[name=ins_desc_perils\\["+index+"\\]]").val();
             var rate = $("input[name=ins_rate\\["+index+"\\]]").val();
-            var sum_insured = $("input[name=ins_sum_insured\\["+index+"\\]]").val();
-            var currentPerilsData = new perilsData(code, desc, rate, sum_insured);
+            var currentPerilsData = new perilsData(code, desc, rate);
             indexPerilsObj[index] = currentPerilsData;
             TABLE_PERILS_DATA.push(indexPerilsObj);
 
-            var markup = "<tr><td>"+code+"</td><td>"+desc+"</td><td style='text-align:right;'>"+rate+"</td><td style='text-align:right;'>"+sum_insured+"</td></tr>";
+            var markup = "<tr><td>"+code+"</td><td>"+desc+"</td><td>"+rate+"</td></tr>";
             $("#perils_table\\["+index+"\\] tbody").append(markup);
             
             //clear input fields after populated in the table
             $("input[name=ins_code\\["+index+"\\]]").val('');
             $("input[name=ins_desc_perils\\["+index+"\\]]").val('');
-            $("input[name=ins_rate\\["+index+"\\]]").val('');
-            $("input[name=ins_sum_insured\\["+index+"\\]]").val('');                
+            $("input[name=ins_rate\\["+index+"\\]]").val('');                
         }
 
         function addTab(){            
@@ -314,17 +341,16 @@ $tabContent = "<div class='row form-group'>
             tabCounter++;           
         }      
         
-        // function interestData(item_no, desc, sum_insured){
-        //     this.ins_item_no = item_no;
-        //     this.ins_desc = desc;
-        //     this.ins_sum_insured = sum_insured;
-        // } 
+        function interestData(item_no, desc, sum_insured){
+            this.ins_item_no = item_no;
+            this.ins_desc = desc;
+            this.ins_sum_insured = sum_insured;
+        } 
 
-        function perilsData(code, desc, rate, sum_insured){
+        function perilsData(code, desc, rate){
             this.ins_code = code;
             this.ins_desc_perils = desc;
             this.ins_rate = rate;
-            this.ins_sum_insured = sum_insured;
         } 
 
 

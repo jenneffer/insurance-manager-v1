@@ -20,7 +20,7 @@ class CreateRiskTable extends Migration
             $table->string('risk_location', 100);
             $table->text('risk_address');
             $table->text('risk_description');
-            $table->text('risk_construction_code');
+            // $table->text('risk_construction_code');
             $table->text('risk_remark')->nullable();
             $table->timestamps();
             $table->softDeletes();

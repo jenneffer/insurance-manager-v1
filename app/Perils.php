@@ -11,7 +11,9 @@ class Perils extends Model
 {
     use SoftDeletes, MultiTenantModelTrait;
 
-    public $table = 'perils';
+    // public $table = 'perils';
+
+    public $table = 'additional_ins_item';
 
     protected $dates = [
         'created_at',
@@ -21,9 +23,11 @@ class Perils extends Model
 
     protected $fillable = [
         'risk_id',
-        'prls_ref_no',
-        'prls_description',
-        'prls_rate'             
+        'ref_no',
+        'description',
+        'rate',
+        'sum_insured',
+        'policy_no'             
     ];
 
     public function getEntryDateAttribute($value)

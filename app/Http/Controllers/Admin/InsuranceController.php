@@ -9,6 +9,7 @@ use App\Perils;
 use App\ExpenseCategory;
 use App\Company;
 use App\Agent;
+use App\InsuranceDetails;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyInsuranceRequest;
 use App\Http\Requests\StoreInsuranceRequest;
@@ -23,7 +24,6 @@ class InsuranceController extends Controller
     public function index()
     {
         abort_if(Gate::denies('insurance_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
         $insurances = Insurance::all();        
         return view('admin.insurances.index', compact('insurances'));
     }
@@ -44,69 +44,75 @@ class InsuranceController extends Controller
         $data = $request->all(); //form data
         $param = array();
         parse_str($data['data'], $param); //unserialize jquery string data  
-
         //insert into insurance table       
         $token = $param['_token'];
         $insurance_table = [
             'ins_agent' =>$param['ins_agent'],
             'ins_company' =>$param['company_id'],
-            'ins_class' =>$param['ins_class'], 
-            'ins_policy_no' =>$param['ins_policy_no'], 
-            'ins_correspond_address' =>$param['ins_correspond_address'], 
-            'ins_date_start' =>$param['ins_date_start'], 
-            'ins_date_end' =>$param['ins_date_end'],
+            'ins_class' =>$param['ins_class'],             
+            'ins_correspond_address' =>$param['ins_correspond_address'],             
             'ins_issuing_branch' =>$param['ins_issuing_branch'], 
-            'ins_issuing_date' =>$param['ins_issuing_date'], 
-            'ins_gross_premium' =>$param['ins_gross_premium'],
-            'ins_service_tax' =>$param['ins_service_tax'], 
-            'ins_stamp_duty' =>$param['ins_stamp_duty'], 
-            'ins_total_sum_insured' =>$param['ins_total_sum_insured'], 
-            'ins_self_rating' => $param['ins_self_rating'],
-            'ins_remark' => $param['ins_remark']
+            'ins_issuing_date' =>$param['ins_issuing_date'],             
+            'ins_mortgagee' => $param['ins_mortgagee'],            
         ];
         //insert into insurance table
         $insurance = Insurance::create($insurance_table);
+        
         //get the last insert id
         $lastInsertID = $insurance->id; 
-        
+
+        // insert into insurance details table
+        $insurance_details_table = [
+            'insurance_id' => $lastInsertID,
+            'policy_no' =>$param['ins_policy_no'], 
+            'date_start' =>$param['ins_date_start'], 
+            'date_end' =>$param['ins_date_end'],
+            'gross_premium' =>$param['ins_gross_premium'],
+            'service_tax' =>$param['ins_service_tax'], 
+            'stamp_duty' =>$param['ins_stamp_duty'], 
+            'sum_insured' =>$param['ins_total_sum_insured'] == '' ? 0 : $param['ins_total_sum_insured'], 
+            'self_rating' => $param['ins_self_rating'],
+            'excess' => $param['ins_excess'],
+            'remark' => $param['ins_remark']
+        ];
+        $insurance_details = InsuranceDetails::create($insurance_details_table);
+
         //risk tabs array
         $risk_location = $param['risk_location'];
         $risk_address = $param['risk_address'];
         $risk_count = count($risk_address);
-        $risk_description = $param['risk_description'];
-        $risk_construction_code = $param['risk_construction_code'];
-
+        $risk_description = $param['properties_insured'];
+        
         for ($i=1; $i <=$risk_count ; $i++) {
             $risk_data = array (
                 'ins_id' => $lastInsertID,
                 'risk_riskno' => $i,
                 'risk_location' => $risk_location[$i],
                 'risk_address' => $risk_address[$i],
-                'risk_description' => $risk_description[$i],
-                'risk_construction_code' => $risk_construction_code[$i]
+                'risk_description' => $risk_description[$i],                
             );   
             //insert into risk table
             $risk = Risk::create($risk_data);  
             $riskLastInsertID = $risk->id;
             //need to parse JSON
-            $interest_insured = json_decode($param['interest_insured']);                 
-            foreach ($interest_insured as $key => $value) {
-                # code...
-                foreach ($value as $risk_tab_id => $risk_data_ii) {
-                    # code...
-                    if($i == $risk_tab_id ){
-                        $interestInsuredData = array(
-                            'risk_id' => $riskLastInsertID,
-                            'ii_item_no' => $risk_data_ii->ins_item_no,
-                            'ii_description' => $risk_data_ii->ins_desc,
-                            'ii_sum_insured' => $risk_data_ii->ins_sum_insured,
-                        );
+            // $interest_insured = json_decode($param['interest_insured']);                 
+            // foreach ($interest_insured as $key => $value) {
+            //     # code...
+            //     foreach ($value as $risk_tab_id => $risk_data_ii) {
+            //         # code...
+            //         if($i == $risk_tab_id ){
+            //             $interestInsuredData = array(
+            //                 'risk_id' => $riskLastInsertID,
+            //                 'ii_item_no' => $risk_data_ii->ins_item_no,
+            //                 'ii_description' => $risk_data_ii->ins_desc,
+            //                 'ii_sum_insured' => $risk_data_ii->ins_sum_insured,
+            //             );
 
-                        $interestInsured = InterestInsured::create($interestInsuredData);    
-                    }
+            //             $interestInsured = InterestInsured::create($interestInsuredData);    
+            //         }
                     
-                }
-            }
+            //     }
+            // }
             $perils = json_decode($param['perils']);  
             foreach ($perils as $key => $value) {
                 # code...
@@ -115,9 +121,11 @@ class InsuranceController extends Controller
                     if($i == $risk_tab_id ){
                         $perilsData = array(
                             'risk_id' => $riskLastInsertID,
-                            'prls_ref_no' => $risk_data_perils->ins_code,
-                            'prls_description' => $risk_data_perils->ins_desc_perils,
-                            'prls_rate' => $risk_data_perils->ins_rate,
+                            'ref_no' => $risk_data_perils->ins_code,
+                            'description' => $risk_data_perils->ins_desc_perils,
+                            'rate' => $risk_data_perils->ins_rate,
+                            'sum_insured' => $risk_data_perils->ins_sum_insured,
+                            'policy_no' => $param['ins_policy_no'] 
                         );
 
                         $perils = Perils::create($perilsData);    
@@ -132,66 +140,123 @@ class InsuranceController extends Controller
     }
 
     public function edit(Insurance $insurance)
-    {
+    {        
+
         abort_if(Gate::denies('insurance_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $company = Company::all()->pluck('compDesc', 'id')->prepend(trans('global.pleaseSelect'), '');
         $agent = Agent::all()->pluck('agentDesc', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+
         $insurance->load('company', 'created_by');
         $insurance->load('agent', 'created_by');
-        $risk = DB::table('risk')->where('ins_id', '=', $insurance->id)->get();
-                 
-        $interest_insured = [];
+        $insurance->load('insurance_details', 'created_by');
+
+        $risk = DB::table('risk')->where('ins_id', '=', $insurance->id)->get();     
+        // $interest_insured = [];
         $perils = [];
         $arr_risk_id = [];
+
+        $ins_details = [];//form array by year
+        $current_year = date("Y");
+        foreach ($insurance->insurance_details as $key => $value) {
+            # code...
+            $year = date('Y', strtotime($value->date_start));
+            $ins_details[$year] = array(
+                'id' => $value->id,
+                'insurance_id' => $value->insurance_id,
+                'policy_no' => $value->policy_no, 
+                'self_rating' => $value->self_rating,
+                'excess' => $value->excess,
+                'remark' => $value->remark,
+                'sum_insured' => $value->sum_insured,
+                'gross_premium' => $value->gross_premium,
+                'service_tax' => $value->service_tax,
+                'stamp_duty' => $value->stamp_duty,
+                'date_start' => $value->date_start,
+                'date_end' => $value->date_end,                
+            );
+                
+        }   
+
         foreach ($risk as $key => $value) {
+
             $risk_id = $value->id;
             $arr_risk_id[] = $risk_id;
-            $interest_insured[$risk_id][] = DB::table('interest_insured')->where('risk_id','=', $risk_id)->whereNull('deleted_at')->get();
-            $perils[$risk_id][] = DB::table('perils')->where('risk_id','=', $risk_id)->whereNull('deleted_at')->get();
+            // $interest_insured[$risk_id][] = DB::table('interest_insured')->where('risk_id','=', $risk_id)->whereNull('deleted_at')->get();
+            $perils[$risk_id][] = DB::table('additional_ins_item')->where('risk_id','=', $risk_id)->whereNull('deleted_at')->get();
+            
         }
-         $risk_count = count($arr_risk_id);   
-         //get the lowest and highest tab index  
-         $lowest_index = min($arr_risk_id);
-         $highest_index = max($arr_risk_id);
-        return view('admin.insurances.edit', compact('company','agent', 'insurance','risk','perils','interest_insured','risk_count','lowest_index','highest_index'));
+        $risk_count = count($arr_risk_id);   
+        //get the lowest and highest tab index  
+        $lowest_index = min($arr_risk_id);
+        $highest_index = max($arr_risk_id);
+
+        return view('admin.insurances.edit', compact('company','agent','insurance','ins_details','current_year','risk','perils','risk_count','lowest_index','highest_index'));
     }
 
     public function update(UpdateInsuranceRequest $request, Insurance $insurance)
     {
         $data = $request->all();
         $param = array();
-        parse_str($data['data'], $param); //unserialize jquery string data  
-        $ins_id = $param['ins_id'];        
+        parse_str($data['data'], $param); //unserialize jquery string data         
+        $ins_id = $param['ins_id'];   
+
         $insurance_table = [
             'ins_agent' =>$param['ins_agent'],
             'ins_company' =>$param['company_id'],
-            'ins_class' =>$param['ins_class'], 
-            'ins_policy_no' =>$param['ins_policy_no'], 
-            'ins_correspond_address' =>$param['ins_correspond_address'], 
-            'ins_date_start' =>$param['ins_date_start'], 
-            'ins_date_end' =>$param['ins_date_end'],
+            'ins_class' =>$param['ins_class'],             
+            'ins_correspond_address' =>$param['ins_correspond_address'],  
             'ins_issuing_branch' =>$param['ins_issuing_branch'], 
             'ins_issuing_date' =>$param['ins_issuing_date'], 
-            'ins_gross_premium' =>$param['ins_gross_premium'],
-            'ins_service_tax' =>$param['ins_service_tax'], 
-            'ins_stamp_duty' =>$param['ins_stamp_duty'], 
-            'ins_total_sum_insured' =>$param['ins_total_sum_insured'], 
-            'updated_at' => date('Y-m-d')
+            'updated_at' => date("Y-m-d H:i:s")
         ];
         //update insurance table
         $affected_ins = DB::table('insurances')
                       ->where('id', $ins_id)
                       ->update($insurance_table);
         
+        //update insurance details table
+        $arr_ins_details_id = $param['ins_details_id'];
+        $arr_policy_no = $param['policy_no'];
+        $arr_date_start = $param['date_start'];
+        $arr_date_end = $param['date_end'];
+        $arr_sum_insured = $param['sum_insured'];
+        $arr_gross_premium = $param['gross_premium'];
+        $arr_service_tax = $param['service_tax'];
+        $arr_stamp_duty = $param['stamp_duty'];
+        $arr_rate = $param['rate'];
+        $arr_remark = $param['remark'];
+        $arr_excess = $param['excess'];
+        
+        foreach ($arr_ins_details_id as $key => $value) {
+            # code...
+            $insurance_details = [
+                'policy_no' => $arr_policy_no[$key],
+                'date_start' => $arr_date_start[$key],
+                'date_end' => $arr_date_end[$key],
+                'sum_insured' => $arr_sum_insured[$key],
+                'gross_premium' => $arr_gross_premium[$key],
+                'service_tax' => $arr_service_tax[$key],
+                'stamp_duty' => $arr_stamp_duty[$key],
+                'self_rating' => $arr_rate[$key],
+                'remark' => $arr_remark[$key],
+                'excess' => $arr_excess[$key],
+            ];
+            
+            $affected_insurance_details = DB::table('insurance_details')
+                                        ->where('id', $value)
+                                        ->update($insurance_details);
+        }
+
+
+
         //risk tabs array
         $risk_location = $param['risk_location'];
         $risk_address = $param['risk_address'];
         $risk_count = count($risk_address);
-        $risk_description = $param['risk_description'];
-        $risk_construction_code = $param['risk_construction_code'];
-        $i = 0;
+        $risk_description = $param['risk_description'];        
+        $i = 0;     
         foreach ($risk_address as $risk_id => $value) {
             # code...
             $i++;
@@ -200,35 +265,34 @@ class InsuranceController extends Controller
                     'risk_riskno' => $i,
                     'risk_location' => $risk_location[$risk_id],
                     'risk_address' => $risk_address[$risk_id],
-                    'risk_description' => $risk_description[$risk_id],
-                    'risk_construction_code' => $risk_construction_code[$risk_id]
+                    'risk_description' => $risk_description[$risk_id],                   
                 ];  
                 //The updateOrInsert method will first attempt to locate a matching database record using the first argument's column and value pairs. If the record exists, it will be updated with the values in the second argument. If the record can not be found, a new record will be inserted with the merged attributes of both arguments
                 $affected_risk = DB::table('risk')->updateOrInsert( ['id' => $risk_id], $risk_data );
 
                 //need to parse JSON - insert newly added 
-                $interest_insured = json_decode($param['interest_insured']);  
+                // $interest_insured = json_decode($param['interest_insured']);  
 
-                if(!empty($interest_insured)){
-                    foreach ($interest_insured as $key => $value) {
-                    # code...
-                        foreach ($value as $risk_tab_id => $risk_data_ii) {
-                            # code... 
-                            if($risk_id == $risk_tab_id ){
-                                $interestInsuredData = array(
-                                    'risk_id' => $risk_id,
-                                    'ii_item_no' => $risk_data_ii->ins_item_no,
-                                    'ii_description' => $risk_data_ii->ins_desc,
-                                    'ii_sum_insured' => $risk_data_ii->ins_sum_insured,
-                                );
+                // if(!empty($interest_insured)){
+                //     foreach ($interest_insured as $key => $value) {
+                //     # code...
+                //         foreach ($value as $risk_tab_id => $risk_data_ii) {
+                //             # code... 
+                //             if($risk_id == $risk_tab_id ){
+                //                 $interestInsuredData = array(
+                //                     'risk_id' => $risk_id,
+                //                     'ii_item_no' => $risk_data_ii->ins_item_no,
+                //                     'ii_description' => $risk_data_ii->ins_desc,
+                //                     'ii_sum_insured' => $risk_data_ii->ins_sum_insured,
+                //                 );
 
-                                $interestInsured = InterestInsured::create($interestInsuredData);    
-                            }
+                //                 $interestInsured = InterestInsured::create($interestInsuredData);    
+                //             }
                             
-                        }
-                    }
+                //         }
+                //     }
 
-                }               
+                // }               
 
                 $perils = json_decode($param['perils']);  
                 if(!empty($perils)){
@@ -239,9 +303,10 @@ class InsuranceController extends Controller
                             if($risk_id == $risk_tab_id ){
                                 $perilsData = array(
                                     'risk_id' => $risk_id,
-                                    'prls_ref_no' => $risk_data_perils->ins_code,
-                                    'prls_description' => $risk_data_perils->ins_desc_perils,
-                                    'prls_rate' => $risk_data_perils->ins_rate,
+                                    'ref_no' => $risk_data_perils->ins_code,
+                                    'description' => $risk_data_perils->ins_desc_perils,
+                                    'rate' => $risk_data_perils->ins_rate,
+                                    'sum_insured' => $risk_data_perils->ins_sum_insured,
                                 );
 
                                 $perils = Perils::create($perilsData);    
@@ -252,29 +317,52 @@ class InsuranceController extends Controller
                 }
             }
 
-        return response()->json(['url'=>url('/admin/insurances')]);
+        // return response()->json(['url'=>url('/admin/insurances')]);
     }
 
     public function show(Insurance $insurance)
     {
         abort_if(Gate::denies('insurance_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $insurance->load('company', 'created_by');
-        
+        $insurance->load('insurance_details', 'created_by');
+
+        $ins_details = [];//form array by year
+        $current_year = date("Y");
+        foreach ($insurance->insurance_details as $key => $value) {
+            # code...
+            $year = date('Y', strtotime($value->date_start));
+            $ins_details[$year] = array(
+                'id' => $value->id,
+                'insurance_id' => $value->insurance_id,
+                'policy_no' => $value->policy_no, 
+                'self_rating' => $value->self_rating,
+                'excess' => $value->excess,
+                'remark' => $value->remark,
+                'sum_insured' => $value->sum_insured,
+                'gross_premium' => $value->gross_premium,
+                'service_tax' => $value->service_tax,
+                'stamp_duty' => $value->stamp_duty,
+                'date_start' => $value->date_start,
+                'date_end' => $value->date_end,                
+            );
+                
+        } 
         //get risk
         $risk = DB::table('risk')->where('ins_id', '=', $insurance->id)->get();
-        $interest_insured = [];
+        // $interest_insured = [];
+
         $perils = [];
         foreach ($risk as $key => $value) {
             $risk_id = $value->id;
-            $interest_insured[$risk_id][] = DB::table('interest_insured')->where('risk_id','=', $risk_id)->whereNull('deleted_at')->get();
-            $perils[$risk_id][] = DB::table('perils')->where('risk_id','=', $risk_id)->whereNull('deleted_at')->get();
+            // $interest_insured[$risk_id][] = DB::table('interest_insured')->where('risk_id','=', $risk_id)->whereNull('deleted_at')->get();
+            $perils[$risk_id][] = DB::table('additional_ins_item')->where('risk_id','=', $risk_id)->whereNull('deleted_at')->get();
         }
-        $insurance['risk'] = $risk;
-        $insurance['interest_insured'] = $interest_insured;
-        $insurance['perils'] = $perils;
 
-        return view('admin.insurances.show',compact('insurance'));
+        $insurance['risk'] = $risk;
+        // $insurance['interest_insured'] = $interest_insured;
+        $insurance['perils'] = $perils;
+        $insurance['ins_details'] = $ins_details;        
+        return view('admin.insurances.show',compact('insurance','current_year'));
     }
 
     public function destroy(Insurance $insurance)
@@ -295,7 +383,8 @@ class InsuranceController extends Controller
 
     public function showPerils(Request $request)
     {
-        $perils = DB::table('perils')->where('id', $request->id)->first();
+        // $perils = DB::table('perils')->where('id', $request->id)->first();
+        $perils = DB::table('additional_ins_item')->where('id', $request->id)->first();
         return response()->json($perils);
 
     }
@@ -336,11 +425,13 @@ class InsuranceController extends Controller
         $code = $param['prls_ref_no'];
         $desc = $param['prls_description'];
         $rate = $param['prls_rate'];
+        $sum_insured = $param['sum_insured'];
 
-        $affected = DB::table('perils')->where('prls_id', $id)->update([
-                    'prls_ref_no' => $code, 
-                    'prls_description' => $desc,
-                    'prls_rate' => $rate
+        $affected = DB::table('additional_ins_item')->where('id', $id)->update([
+                    'ref_no' => $code, 
+                    'description' => $desc,
+                    'rate' => $rate,
+                    'sum_insured' => $sum_insured
                 ]);    
 
         return response()->json(['url'=>url('/admin/insurances/'.$ins_id.'/edit')]);

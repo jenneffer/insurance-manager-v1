@@ -20,12 +20,14 @@
                 <thead>
                     <tr>
                         <th>&nbsp;</th>
-                        <th>Insurance Agent</th>
-                        <th width="10%">Policy Holder</th>
-                        <th width="15%">Location</th>
-                        <th width="25%">Policy No.</th>                        
-                        <th width="15%">Sum Insured (RM)</th>
-                        <th width="20%">Properties Insured</th>                       
+                        <th style="width: 15%;">Insurance Agent</th>
+                        <th>Policy Holder</th>
+                        <th>Policy No.</th>
+                        <th style="width: 10%;">Period of Insurance</th>
+                        <th>Issuing Date</th>
+                        <th>Issuing Branch</th>
+                        <th>Premium</th>
+                        <th style="width: 5%;">Shortcut View</th>
                         <th>Modify</th>
                     </tr>                    
                 </thead>
@@ -35,21 +37,23 @@
                         <td></td>
                         <td>{{$ins->agent->agentDesc}}</td>
                         <td>{{$ins->company->compCode ?? '' }}</td>
-                        <td>{{$ins->ins_correspond_address}}</td>                        
+                        <td>{{$ins->ins_policy_no}}</td>
+                        <td>{{$ins->ins_date_start}} to <br>{{$ins->ins_date_end}}</td>
+                        <td>{{$ins->ins_issuing_date}}</td>
+                        <td>{{$ins->ins_issuing_branch}}</td>
                         <td>
-                          @foreach($ins->insurance_details as $key => $ins_details)
-                            {{$ins_details->policy_no}}<br>
-                            <span class="small text-primary">({{$ins_details->date_start}} to {{$ins_details->date_end}})</span>
-                            <br>
-                          @endforeach
-                        </td>                       
-                        <td class="text-right">
-                          @foreach($ins->insurance_details as $key => $ins_details)
-                            {{number_format($ins_details->sum_insured,2)}}<br>
-                          @endforeach
+                          <b>Gross Premium :</b>RM {{$ins->ins_gross_premium}}
+                          <br>
+                          <b>Services Tax :</b>RM {{$ins->ins_service_tax}}
+                          <br>
+                          <b>Stamp Duty :</b>RM {{$ins->ins_stamp_duty}}
+                          <br>
+                          <b>Total Premium :</b>RM {{$ins->ins_gross_premium + $ins->ins_service_tax + $ins->ins_stamp_duty }}
                         </td>
-                        
-                        <td>{{$ins->risk->risk_description ?? ''}}</td>                     
+                        <td>
+                          <a href="#" id="{{$ins->id}}" class="sum_insured_modal">Sum Insured</a><br>
+                          <a href="#" id="{{$ins->id}}" class="perils_modal">Perils</a>
+                        </td>
                         <td>
                             @can('insurance_show')
                                 <a class="btn btn-xs btn-primary" href="{{ route('admin.insurances.show', $ins->id) }}">
@@ -70,11 +74,7 @@
                                     <input type="submit" class="btn btn-xs btn-danger" value="{{ trans('global.delete') }}">
                                 </form>
                             @endcan
-                            @can('insurance_renew')
-                                <a class="btn btn-xs btn-warning renew_button" href="{{route('admin.insurances.renew', $ins->id) }}">
-                                    {{ trans('global.renew') }}
-                                </a>     
-                            @endcan
+
                         </td>
                     </tr>
                     @endforeach
@@ -114,16 +114,15 @@
 <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
         <div class="modal-header">
-            <h4 class="modal-title">Additional Insured</h4>
+            <h4 class="modal-title">Perils</h4>
         </div>
         <div class="modal-body">
           <table class='table table-sm' id='perils_table'>
             <thead>
                 <tr>
-                    <th width="8%">Item No.</th>
-                    <th width="50%" class="text-center">Description</th>
-                    <th width="10%" class="text-right">Rate (%)</th>      
-                    <th width="20%" class="text-right">Sum Insured(RM)</th>                                
+                    <th>Code</th>
+                    <th class="text-center">Description</th>
+                    <th class="text-right">Rate (%)</th>                                
                 </tr>
             </thead>
             <tbody>                            
@@ -139,9 +138,29 @@
 @parent
 <script>
 $(function () {
+  //show interest insured data
+  $('.sum_insured_modal').click(function(){
+    var id = $(this).attr("id");
+    $.ajax({
+        url:"/admin/interest_insured/retrieve_ii",
+        method:"POST",
+        data:{
+            "_token": "{{ csrf_token() }}",
+            id:id
+        },
+        success:function(data){
+            var tbody = ''; 
+            $("#interest_insured_table").find("tbody").empty(); //clear all the content from tbody here.                                                             
+            $('#InterestInsuredTable').modal('show');
+            $( data ).each( function( index, element ){
+                tbody +="<tr><td>"+element.ii_item_no+"</td><td>"+element.ii_description+"</td><td class='text-right'>"+element.ii_sum_insured.toLocaleString()+"</td></tr>"
+            });
+            $('#interest_insured_table').find('tbody').append(tbody);
 
-  //show or hide button renew
 
+        }
+    });
+  });
 
   $('.perils_modal').click(function(){
       var id = $(this).attr("id");
@@ -157,14 +176,12 @@ $(function () {
           $("#perils_table").find("tbody").empty(); //clear all the content from tbody here.       
           $('#PerilsTable').modal('show'); 
           $( data ).each( function( index, element ){
-            var rate = (element.rate == null || element.rate == "-")  ? "-" : element.rate+"%";
-                tbody +="<tr><td>"+element.ref_no+"</td><td>"+element.description+"</td><td class='text-right'>"+rate+"</td><td class='text-right'>RM "+element.sum_insured.toFixed(2)+"</td></tr>"
+                tbody +="<tr><td>"+element.prls_ref_no+"</td><td>"+element.prls_description+"</td><td class='text-right'>"+element.prls_rate+"%</td></tr>"
             });
             $('#perils_table').find('tbody').append(tbody);
           }
       });
   });
-
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
   @can('insurance_delete')
     let deleteButtonTrans = '{{ trans('global.datatables.delete') }}'

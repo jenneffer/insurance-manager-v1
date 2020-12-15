@@ -5,6 +5,7 @@ use App\Traits\MultiTenantModelTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Insurance extends Model
 {
     use SoftDeletes, MultiTenantModelTrait;
@@ -21,23 +22,18 @@ class Insurance extends Model
         'ins_agent',
         'ins_company',
         'ins_class',
-        'ins_policy_no',
         'ins_correspond_address',
-        'ins_date_start',
-        'ins_date_end',
         'ins_issuing_branch',
         'ins_issuing_date',
-        'ins_gross_premium',
-        'ins_service_tax',
-        'ins_stamp_duty',
-        'ins_total_sum_insured',
-        'ins_self_rating',
-        'ins_remark'
+        'ins_mortgagee'
     ];
 
+    public function insurance_details(){
+        return $this->hasMany(InsuranceDetails::class,'insurance_id');
+    }
     public function risk()
     {
-        return $this->belongsTo(Risk::class, 'ins_id');   
+        return $this->belongsTo(Risk::class, 'id');   
     }
 
     public function company()

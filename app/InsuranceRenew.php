@@ -1,41 +1,31 @@
 <?php
 
 namespace App;
-
 use App\Traits\MultiTenantModelTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Risk extends Model
+class InsuranceRenew extends Model
 {
     use SoftDeletes, MultiTenantModelTrait;
 
-    public $table = 'risk';
-    protected $dates = [
+    public $table = 'insurance_details';
+
+    protected $dates = [       
         'created_at',
         'updated_at',
         'deleted_at',
     ];
+
     protected $fillable = [
-        'ins_id',
-        'risk_riskno',
-        'risk_location',
-        'risk_address',
-        'risk_description',
-        // 'risk_construction_code',     
-        'created_by_id'  
-    ];
-
-    public function insurances()
-    {
-        return $this->hasMany(Insurance::class, 'id', 'ins_id');
-    }
-
-    public function perils()
-    {
-        return $this->hasMany(perils::class,'risk_id','id');
-    }
+        'insurance_id',
+        'policy_no',                
+        'date_start',
+        'date_end',
+        'sum_insured',        
+        'remark',        
+    ];   
 
     public function getEntryDateAttribute($value)
     {
@@ -50,5 +40,4 @@ class Risk extends Model
     {
         return $this->belongsTo(User::class, 'created_by_id');
     }
-
 }

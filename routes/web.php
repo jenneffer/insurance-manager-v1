@@ -22,13 +22,23 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     //Insurance - 20200803 by Jenn
     Route::delete('insurances/destroy', 'InsuranceController@massDestroy')->name('insurances.massDestroy');
     Route::resource('insurances', 'InsuranceController');
+    //insurance renew
     Route::post('/insurance/add', 'InsuranceController@store')->name('insurances.store');
     Route::post('/insurance/update', 'InsuranceController@update')->name('insurances.update');
+    // Route::post('/insurance/renew', 'InsuranceController@renew')->name('insurances.renew');
     Route::post('/interest_insured/retrieve', 'InsuranceController@showInterestInsured')->name('insurances.showInterestInsured');
     Route::post('/interest_insured/update', 'InsuranceController@updateInterestInsured')->name('insurances.updateInterestInsured');    
     Route::post('/perils/retrieve', 'InsuranceController@showPerils')->name('insurances.showPerils');
-    Route::post('/perils/update', 'InsuranceController@updatePerils')->name('insurances.updatePerils');    
+    Route::post('/perils/update', 'InsuranceController@updatePerils')->name('insurances.updatePerils'); 
 
+
+
+    Route::resource('insurance_details', 'InsuranceDetailsController');
+    Route::get('/insurance/renew/{id}','InsuranceDetailsController@index')->name('insurances.renew');
+    Route::get('/insurance/renew_without_addition/{id}', 'InsuranceDetailsController@renew_without_addition')->name('insurances.renew_without_addition');
+    Route::get('/insurance/renew_with_addition/{id}', 'InsuranceDetailsController@renew_with_addition')->name('insurances.renew_with_addition');
+    Route::post('/insurance/update_renewal', 'InsuranceDetailsController@update_renewal')->name('insurances.update_renewal'); //update renewal without addition
+    Route::post('/insurance/update_renewal_add', 'InsuranceDetailsController@update_renewal_add')->name('insurances.update_renewal_add'); //update renewal with addition
     //Company
     Route::delete('companies/destroy', 'CompanyController@massDestroy')->name('companies.massDestroy');
     Route::resource('companies', 'CompanyController');

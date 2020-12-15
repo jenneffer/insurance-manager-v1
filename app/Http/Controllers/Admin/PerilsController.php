@@ -51,8 +51,8 @@ class PerilsController extends Controller
         abort_if(Gate::denies('perils_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $perils = DB::table('risk')
-            ->join('perils', 'perils.risk_id', '=', 'risk.id')
-            ->select('perils.*')->where('ins_id', $request->id)->get();
+            ->join('additional_ins_item', 'additional_ins_item.risk_id', '=', 'risk.id')
+            ->select('additional_ins_item.*')->where('ins_id', $request->id)->get();
 
         return response()->json($perils); 
     }
@@ -61,9 +61,12 @@ class PerilsController extends Controller
     {
         abort_if(Gate::denies('perils_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         // DB::table('interest_insured')->where('id', $request->id)->delete();
-        $affected = DB::table('perils')->where('id', $request->id)->update([
+        // $affected = DB::table('perils')->where('id', $request->id)->update([
+        //     'deleted_at' => Carbon::now(),    
+        // ]);      
+        $affected = DB::table('additional_ins_item')->where('id', $request->id)->update([
             'deleted_at' => Carbon::now(),    
-        ]);       
+        ]); 
         return response()->json(['url'=>url('/admin/insurances/'.$request->ins_id.'/edit')]);
         // return back();
     }
