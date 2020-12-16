@@ -15,8 +15,8 @@
             @endforeach                          
         </ul>
         <div class="tab-content" id="myTabContent">
-                @foreach($insurance->ins_details as $key => $ins_data)   
-                <div class='tab-pane fade show {{ $key == $current_year ? "active" : "" }}' id='tab-{{$key}}' role='tabpanel' aria-labelledby='{{$key}}'>    
+                @foreach($insurance->ins_details as $year => $ins_data)   
+                <div class='tab-pane fade show {{ $year == $current_year ? "active" : "" }}' id='tab-{{$year}}' role='tabpanel' aria-labelledby='{{$year}}'>    
                     <br>
                     <div class="mb-2">
                         <div class="form-group row col-sm-12">
@@ -116,14 +116,16 @@
                                     </thead>
                                     <tbody>
                                         @foreach($insurance->perils[$risk->id] as $perils)
-                                            @foreach($perils as $data)                                                         
-                                                <tr>
+                                            @foreach($perils as $data)
+                                                @if($ins_data['policy_no'] == $data->policy_no)
+                                                 <tr>
                                                     <td>{{$data->ref_no}}</td>
                                                     <td>{{$data->description}}</td>
                                                     <td class="text-right">{{$data->rate}}</td>
-                                                    <td class="text-right">{{number_format($data->sum_insured,2)}}</td>
+                                                    <td class="text-right">{{number_format($data->sum_insured,2)}}</td>                         
                                                 </tr>
-                                            @endforeach  
+                                                @endif
+                                            @endforeach
                                         @endforeach                                                            
                                     </tbody>
                                     <tfoot>

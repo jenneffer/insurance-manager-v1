@@ -20,10 +20,10 @@ class CreateInsuranceDetails extends Migration
             $table->string('self_rating', 50);
             $table->string('excess', 50);
             $table->text('remark');
-            $table->float('sum_insured');
-            $table->float('gross_premium');
-            $table->float('service_tax');
-            $table->float('stamp_duty');
+            $table->double('sum_insured',15,2);
+            $table->double('gross_premium',15,2);
+            $table->double('service_tax',15,2);
+            $table->double('stamp_duty',15,2);
             $table->date('date_start');
             $table->date('date_end');
             $table->timestamps();

@@ -20,7 +20,7 @@ class CreateInsurancesTable extends Migration
             $table->date('ins_issuing_date');
             $table->string('ins_class', 100);
             $table->text('ins_issuing_branch');
-            $table->double('ins_total_sum_insured', 15, 2);
+            $table->text('ins_mortgagee');
             $table->timestamps();
             $table->softDeletes();
         });

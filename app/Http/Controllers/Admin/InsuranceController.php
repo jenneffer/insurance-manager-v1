@@ -347,17 +347,15 @@ class InsuranceController extends Controller
             );
                 
         } 
+        
         //get risk
         $risk = DB::table('risk')->where('ins_id', '=', $insurance->id)->get();
         // $interest_insured = [];
-
         $perils = [];
-        foreach ($risk as $key => $value) {
+        foreach ($risk as $key => $value) {            
             $risk_id = $value->id;
-            // $interest_insured[$risk_id][] = DB::table('interest_insured')->where('risk_id','=', $risk_id)->whereNull('deleted_at')->get();
-            $perils[$risk_id][] = DB::table('additional_ins_item')->where('risk_id','=', $risk_id)->whereNull('deleted_at')->get();
+            $perils[$risk_id][] = DB::table('additional_ins_item')->where('risk_id','=', $risk_id)->whereNull('deleted_at')->get();            
         }
-
         $insurance['risk'] = $risk;
         // $insurance['interest_insured'] = $interest_insured;
         $insurance['perils'] = $perils;

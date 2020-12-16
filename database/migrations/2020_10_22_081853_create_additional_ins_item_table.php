@@ -18,6 +18,7 @@ class CreateAdditionalInsItemTable extends Migration
             $table->integer('risk_id');
             $table->string('ref_no', 25);
             $table->text('description');
+            $table->text('policy_no');
             $table->string('rate', 25);
             $table->double('sum_insured', 15, 2);
             $table->timestamps();
