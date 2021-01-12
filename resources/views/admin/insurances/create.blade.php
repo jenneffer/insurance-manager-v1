@@ -72,48 +72,44 @@ $tabContent = "<div class='row form-group'>
             <!-- Insurance basic info -->
             <div class="row form-group">
                 <div class="col-sm-3">
-                    <label for="title">Insurance Agent <span style="color:red;">*</span></label>
+                    <label for="title">Agent <span style="color:red;">*</span></label>
                     <select name="ins_agent" id="ins_agent" class="form-control select2" required="required">
                         @foreach($agent as $id => $ag)
-                            <option value="{{ $id }}" >{{ $ag }}</option>
+                            <option value="{{ $id }}" >{{ strtoupper($ag) }}</option>
                         @endforeach
                     </select>   
                 </div>
-                <div class="col-sm-3 {{ $errors->has('company_id') ? 'has-error' : '' }}">
-                    <label for="company">Policy Holder <span style="color:red;">*</span></label>
-                    <select name="company_id" id="company_id" class="form-control select2" required="required">
-                        @foreach($company as $id => $comp)
-                            <option value="{{ $id }}" {{ (isset($insurance) && $insurance->comp ? $insurance->comp->id : old('company_id')) == $id ? 'selected' : '' }}>{{ $comp }}</option>
+                
+                <div class="col-sm-3">
+                    <label for="insurance_comp_id">Insurance Company <span style="color:red;">*</span></label>
+                    <select name="insurance_comp_id" id="insurance_comp_id" class="form-control select2" required="required">
+                        @foreach($insuranceCompany as $id => $ins_comp)
+                            <option value="{{ $id }}">{{ strtoupper($ins_comp) }}</option>
                         @endforeach
                     </select>
-                    @if($errors->has('company_id'))
-                        <em class="invalid-feedback">
-                            {{ $errors->first('company_id') }}
-                        </em>
-                    @endif
-                </div>
-                <div class="col-sm-3">
-                    <label for="ins_class">Class of Insurance <span style="color:red;">*</span></label>
-                    <input name="ins_class" id="ins_class" class="form-control" required="required">
                 </div>
                 <div class="col-sm-3">
                     <label for="ins_policy_no">Policy No. <span style="color:red;">*</span></label>
                     <input name="ins_policy_no" id="ins_policy_no" class="form-control" required="required">
-                </div>                  
+                </div>   
+                <div class="col-sm-3">
+                    <label for="ins_class">Class of Insurance <span style="color:red;">*</span></label>
+                    <input name="ins_class" id="ins_class" class="form-control" required="required">
+                </div>               
             </div>
             <div class="row form-group">
-                 <div class="col-sm-6">
+                <div class="col-sm-3">
+                    <label for="company">Policy Holder <span style="color:red;">*</span></label>
+                    <select name="company_id" id="company_id" class="form-control select2" required="required">
+                        @foreach($company as $id => $comp)
+                            <option value="{{ $id }}">{{ strtoupper($comp) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                 <div class="col-sm-9">
                     <label for="ins_correspond_address">Correspondence Address <span style="color:red;">*</span></label>
                     <input name="ins_correspond_address" id="ins_correspond_address" class="form-control" required="required">
-                </div>
-                <div class="col-sm-3">
-                    <label for="ins_self_rating">Rate</label>
-                    <input name="ins_self_rating" id="ins_self_rating" class="form-control">
-                </div>
-                <div class="col-sm-3">
-                    <label for="ins_excess">Excess</label>
-                    <input name="ins_excess" id="ins_excess" class="form-control">
-                </div>                 
+                </div>                                 
             </div>
             <div class="row form-group">
                 <div class="col-sm-3">
@@ -152,14 +148,22 @@ $tabContent = "<div class='row form-group'>
                 </div>                  
             </div> 
             <div class="row form-group">
-                <div class="col-sm-6">
-                    <label for="ins_remark">Remarks</label>
-                    <textarea name="ins_remark" id="ins_remark" class="form-control" rows="2" cols="40"></textarea>
-                </div>   
-                <div class="col-sm-6">
+                <div class="col-sm-3">
+                    <label for="ins_self_rating">Rate</label>
+                    <input name="ins_self_rating" id="ins_self_rating" class="form-control">
+                </div>
+                <div class="col-sm-3">
+                    <label for="ins_excess">Excess</label>
+                    <input name="ins_excess" id="ins_excess" class="form-control">
+                </div>                  
+                <div class="col-sm-3">
                     <label for="ins_remark">Mortgagee</label>
                     <input name="ins_mortgagee" id="ins_mortgagee" class="form-control">
-                </div>                                 
+                </div>  
+                <div class="col-sm-3">
+                    <label for="ins_remark">Remarks</label>
+                    <textarea name="ins_remark" id="ins_remark" class="form-control" rows="2" cols="40"></textarea>
+                </div>                                
             </div>
 
             <!-- Insurance add risk tab -->
@@ -199,12 +203,18 @@ $tabContent = "<div class='row form-group'>
         var select_company = $("#company_id").select2({
             selectOnClose: true
         });
+        var select_ins_company = $("#insurance_comp_id").select2({
+            selectOnClose: true
+        }); 
         
         select_company.data('select2').$selection.css('height', '35px');
         select_company.data('select2').$selection.css('border', '1px solid #e4e7ea');    
 
         select_agent.data('select2').$selection.css('height', '35px');
-        select_agent.data('select2').$selection.css('border', '1px solid #e4e7ea');  
+        select_agent.data('select2').$selection.css('border', '1px solid #e4e7ea'); 
+
+        select_ins_company.data('select2').$selection.css('height', '35px');
+        select_ins_company.data('select2').$selection.css('border', '1px solid #e4e7ea');  
 
         //get the default first row        
         tabCounter = 1;        

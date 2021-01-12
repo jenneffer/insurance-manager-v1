@@ -8,26 +8,41 @@
 
     <div class="card-body insurance-font">
         <ul class="nav nav-tabs" id="tabs" role="tablist">  
-            @foreach($insurance->ins_details as $key => $ins_data)               
+
+            @foreach($insurance->ins_details as $key => $ins_data)  
             <li class="nav-item">
-                <a class='nav-link {{ $key == $current_year ? "active" : "" }}' data-toggle='tab' id='{{$key}}' href='#tab-{{$key}}' role='tab' aria-controls="+id+" aria-selected='true'>YEAR {{$key}}</a>
+                <a class='nav-link {{ $loop->last ? "active" : "" }}' data-toggle='tab' id='{{$key}}' href='#tab-{{$key}}' role='tab' aria-controls="+id+" aria-selected='true'>YEAR {{$key}}</a>
             </li>   
             @endforeach                          
         </ul>
         <div class="tab-content" id="myTabContent">
                 @foreach($insurance->ins_details as $year => $ins_data)   
-                <div class='tab-pane fade show {{ $year == $current_year ? "active" : "" }}' id='tab-{{$year}}' role='tabpanel' aria-labelledby='{{$year}}'>    
+                <div class='tab-pane fade show {{ $loop->last ? "active" : "" }}' id='tab-{{$year}}' role='tabpanel' aria-labelledby='{{$year}}'>    
                     <br>
                     <div class="mb-2">
                         <div class="form-group row col-sm-12">
-                            <div class="col-sm-2"><strong>Insured / Policyholder</strong></div>
-                            <div class="col-sm-1 text-right">:</div>
-                            <div class="col-sm-9">{{$insurance->company->compDesc}}</div>
+                            <div class="col-sm-6 row">
+                                <div class="col-sm-4"><strong>Insured / Policyholder</strong></div>
+                                <div class="col-sm-1 text-right">:</div>
+                                <div class="col-sm-6">{{$insurance->company->compDesc}}</div>
+                            </div>
+                            <div class="col-sm-6 row">
+                                <div class="col-sm-4"><strong>Agent</strong></div>
+                                <div class="col-sm-1 text-right">:</div>
+                                <div class="col-sm-6">{{$insurance->agent->agentDesc}}</div>
+                            </div>
                         </div>
                         <div class="form-group row col-sm-12">
-                            <div class="col-sm-2"><strong>Correspondence Address</strong></div>
-                            <div class="col-sm-1 text-right">:</div>
-                            <div class="col-sm-9">{{$insurance->ins_correspond_address}}</div>
+                            <div class="col-sm-6 row">
+                                <div class="col-sm-4"><strong>Correspondence Address</strong></div>
+                                <div class="col-sm-1 text-right">:</div>
+                                <div class="col-sm-6">{{$insurance->ins_correspond_address}}</div>
+                            </div>
+                            <div class="col-sm-6 row">
+                                <div class="col-sm-4"><strong>Insurance Company</strong></div>
+                                <div class="col-sm-1 text-right">:</div>
+                                <div class="col-sm-6">{{$insurance->insurance_company->ins_agent_desc}}</div>
+                            </div>
                         </div>
                         <hr>
                         <div class="form-group row col-sm-12">
@@ -84,7 +99,7 @@
                         <div class="form-group row col-sm-12">
                             <div class="col-sm-2"><strong>Self Rating</strong></div>
                             <div class="col-sm-1 text-right">:</div>
-                            <div class="col-sm-3"> {{ $ins_data['self_rating']}}</div>
+                            <div class="col-sm-3"> {{ number_format(floatval($ins_data['self_rating']),5)}}</div>
                         </div>
                         <div class="form-group row col-sm-12">
                             <div class="col-sm-2"><strong>Remarks</strong></div>
@@ -116,15 +131,17 @@
                                     </thead>
                                     <tbody>
                                         @foreach($insurance->perils[$risk->id] as $perils)
-                                            @foreach($perils as $data)
-                                                @if($ins_data['policy_no'] == $data->policy_no)
+                                            @foreach($perils as $key => $data)  
+                                                @foreach($data as $dat)   
+                                                @if($key == $year)                                         
                                                  <tr>
-                                                    <td>{{$data->ref_no}}</td>
-                                                    <td>{{$data->description}}</td>
-                                                    <td class="text-right">{{$data->rate}}</td>
-                                                    <td class="text-right">{{number_format($data->sum_insured,2)}}</td>                         
+                                                    <td>{{$dat->ref_no}}</td>
+                                                    <td>{{$dat->description}}</td>
+                                                    <td class="text-right">{{$dat->rate}}</td>
+                                                    <td class="text-right">{{number_format($dat->sum_insured,2)}}</td>                         
                                                 </tr>
                                                 @endif
+                                                @endforeach
                                             @endforeach
                                         @endforeach                                                            
                                     </tbody>

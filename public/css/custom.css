@@ -163,6 +163,30 @@ table.dataTable thead .sorting_desc {
 .select2-selection__arrow {
   margin: 5px;
 }
+.warning_button {
+  animation: blink 2s steps(5, start) infinite;
+  -webkit-animation: blink 1s steps(5, start) infinite;
+}
+@keyframes blink {
+  to {
+	visibility: hidden;
+  }
+}
+@-webkit-keyframes blink {
+  to {
+	visibility: hidden;
+  }
+}
+
+.floating_warning {
+	position: absolute;	
+	background-color: #ff6d05;
+	left: 40%;
+	z-index: 1;
+	padding: 20px;
+	animation: blink 2s steps(5, start) infinite;
+	-webkit-animation: blink 1s steps(5, start) infinite;
+}
 
 
 

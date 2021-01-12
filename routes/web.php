@@ -60,4 +60,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('agents/destroy', 'AgentController@massDestroy')->name('agents.massDestroy');
     Route::resource('agents', 'AgentController');
 
+    //insurance company
+    Route::delete('insuranceCompany/destroy', 'InsuranceCompanyController@massDestroy')->name('insuranceCompany.massDestroy');
+    Route::resource('insuranceCompany', 'InsuranceCompanyController');
+    
+
 });

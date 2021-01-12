@@ -46,6 +46,11 @@ class Insurance extends Model
         return $this->belongsTo(Agent::class, 'ins_agent');   
     }
 
+    public function insurance_company()
+    {
+        return $this->belongsTo(InsuranceCompany::class, 'insurance_comp_id');   
+    }
+
     public function getEntryDateAttribute($value)
     {
         return $value ? Carbon::parse($value)->format(config('panel.date_format')) : null;

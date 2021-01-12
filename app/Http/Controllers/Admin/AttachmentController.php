@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Attachment;
 use App\Insurance;
+use App\InsuranceDetails;
 use App\Agent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAttachmentRequest;
@@ -23,8 +24,9 @@ class AttachmentController extends Controller
         // $attachment = Attachment::all();
         $attachment = DB::table('attachments')
             ->join('insurances', 'insurances.id', '=', 'attachments.ins_id')
+            ->join('insurance_details','insurances.id','=','insurance_details.insurance_id')
             ->join('agents', 'agents.id', '=', 'insurances.ins_agent')
-            ->select('attachments.*', 'agents.agentDesc', 'insurances.ins_policy_no')->whereNull('attachments.deleted_at')->get();
+            ->select('attachments.*', 'agents.agentDesc', 'insurance_details.policy_no')->whereNull('attachments.deleted_at')->get();
 
         return view('admin.attachments.index', compact('attachment'));
     }
@@ -32,7 +34,7 @@ class AttachmentController extends Controller
     public function create()
     {
         abort_if(Gate::denies('attachment_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $insurance_policy = Insurance::all()->pluck('ins_policy_no', 'id')->prepend(trans('global.pleaseSelect'), '');        
+        $insurance_policy = InsuranceDetails::all()->pluck('policy_no', 'id')->prepend(trans('global.pleaseSelect'), '');        
     
         return view('admin.attachments.create', compact('insurance_policy'));
     }

@@ -1,22 +1,22 @@
 @extends('layouts.admin')
 @section('content')
-@can('company_create')
+@can('insurance_company_create')
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
-            <a class="btn btn-success" href="{{ route("admin.companies.create") }}">
-                {{ trans('global.add') }} {{ trans('cruds.company.title_singular') }}
+            <a class="btn btn-success" href="{{ route("admin.insuranceCompany.create") }}">
+                {{ trans('global.add') }} Insurance Company
             </a>
         </div>
     </div>
 @endcan
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.company.title_singular') }} {{ trans('global.list') }}
+        Insurance Company {{ trans('global.list') }}
     </div>
 
     <div class="card-body">
         <div class="table-responsive">
-            <table class=" table table-bordered table-striped table-hover datatable datatable-Expense">
+            <table class=" table table-bordered table-striped table-hover datatable datatable-Agents">
                 <thead>
                     <tr>
                         <th width="10"></th>
@@ -27,27 +27,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($company as $key => $comp)
-                        <tr data-entry-id="{{ $comp->id }}">
+                    @foreach($insuranceCompany as $key => $ag)
+                        <tr data-entry-id="{{ $ag->id }}">
                             <td></td>
-                            <td>{{ $comp->id }}</td>
-                            <td>{{ $comp->compCode }}</td>
-                            <td>{{ $comp->compDesc }}</td>                            
+                            <td>{{ $ag->id }}</td>
+                            <td>{{ $ag->ins_agent_code }}</td>
+                            <td>{{ $ag->ins_agent_desc }}</td>                            
                             <td>
-                                @can('company_show')
-                                    <a class="btn btn-xs btn-primary" href="{{ route('admin.companies.show', $comp->id) }}">
+                                @can('insurance_company_show')
+                                    <a class="btn btn-xs btn-primary" href="{{ route('admin.insuranceCompany.show', $ag->id) }}">
                                         {{ trans('global.view') }}
                                     </a>
                                 @endcan
 
-                                @can('company_edit')
-                                    <a class="btn btn-xs btn-info" href="{{ route('admin.companies.edit', $comp->id) }}">
+                                @can('insurance_company_edit')
+                                    <a class="btn btn-xs btn-info" href="{{ route('admin.insuranceCompany.edit', $ag->id) }}">
                                         {{ trans('global.edit') }}
                                     </a>
                                 @endcan
 
-                                @can('company_delete')
-                                    <form action="{{ route('admin.companies.destroy', $comp->id) }}" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
+                                @can('insurance_company_delete')
+                                    <form action="{{ route('admin.insuranceCompany.destroy', $ag->id) }}" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
                                         <input type="hidden" name="_method" value="DELETE">
                                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                         <input type="submit" class="btn btn-xs btn-danger" value="{{ trans('global.delete') }}">
@@ -71,11 +71,11 @@
 <script>
     $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-@can('company_delete')
+@can('insurance_company_delete')
   let deleteButtonTrans = '{{ trans('global.datatables.delete') }}'
   let deleteButton = {
     text: deleteButtonTrans,
-    url: "{{ route('admin.companies.massDestroy') }}",
+    url: "{{ route('admin.insuranceCompany.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
       var ids = $.map(dt.rows({ selected: true }).nodes(), function (entry) {
@@ -105,7 +105,7 @@
     order: [[ 1, 'desc' ]],
     pageLength: 100,
   });
-  $('.datatable-Expense:not(.ajaxTable)').DataTable({ buttons: dtButtons })
+  $('.datatable-Agents:not(.ajaxTable)').DataTable({ buttons: dtButtons })
     $('a[data-toggle="tab"]').on('shown.bs.tab', function(e){
         $($.fn.dataTable.tables(true)).DataTable()
             .columns.adjust();

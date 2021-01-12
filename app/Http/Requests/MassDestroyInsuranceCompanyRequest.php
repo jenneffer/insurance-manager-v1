@@ -2,16 +2,16 @@
 
 namespace App\Http\Requests;
 
-use App\Agent;
+use App\InsuranceCompany;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpFoundation\Response;
 
-class MassDestroyAgentRequest extends FormRequest
+class MassDestroyInsuranceCompanyRequest extends FormRequest
 {
     public function authorize()
     {
-        abort_if(Gate::denies('agent_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        abort_if(Gate::denies('insurance_company_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         return true;
     }
@@ -20,7 +20,7 @@ class MassDestroyAgentRequest extends FormRequest
     {
         return [
             'ids'   => 'required|array',
-            'ids.*' => 'exists:agent,id',
+            'ids.*' => 'exists:insurance_company,id',
         ];
     }
 }

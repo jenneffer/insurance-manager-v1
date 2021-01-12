@@ -61,7 +61,7 @@ class InsuranceDetailsController extends Controller
             'remark' => $param['ins_remark'],               
         ];
         //insert into insurance details table
-        $insurance = InsuranceRenew::create($insurance_renew); //create model insurancerenew besok
+        $insurance = InsuranceDetails::create($insurance_renew); //create model insurancerenew besok
         return response()->json(['url'=>url('/admin/insurances')]);  
     }
 
@@ -88,9 +88,11 @@ class InsuranceDetailsController extends Controller
         $properties_insured = $param['properties_insured'];
 
         //additional item 
-        $perils = json_decode($param['perils']);          
+        $perils = json_decode($param['perils']);      
+        $additional_items_id = [];
+        $risk_id = "";  //will fix later if the tab involve is more than 1  
         foreach ($perils as $key => $value) {
-            # code...
+            # code...            
             foreach ($value as $risk_tab_id => $risk_data_perils) {
                 # code...
                 $perilsData = array(
@@ -103,9 +105,29 @@ class InsuranceDetailsController extends Controller
                     );
 
                 $perils = Perils::create($perilsData);
+
+                //kumpul id utk dimasukkan dalam table renewal_item_controller based on the current year
+                //get the last insert id
+                $lastInsertID = $perils->id;
+                $risk_id = $risk_tab_id; 
+                $additional_items_id[] = $lastInsertID;
                 
             }
         }
+
+        //insert into renewal_item_controller
+        //implode additional_items_id & risk_tab_id
+        $items_id = implode(",", $additional_items_id);
+        //get year of date start
+        $ds_year = date('Y', strtotime($param['ins_date_start']));
+        
+        DB::table('renewal_item_controller')->insert([
+            'ins_id' => $ins_id,
+            'year' =>$ds_year,
+            'risk_id' => $risk_id,
+            'item_id' => $items_id,
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
 
         return response()->json(['url'=>url('/admin/insurances')]);   
     }

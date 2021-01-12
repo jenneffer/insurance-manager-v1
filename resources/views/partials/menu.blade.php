@@ -44,6 +44,16 @@
                     </ul>
                 </li>
             @endcan
+            @can('insurance_company_access')
+                <li class="nav-item">
+                    <a href="{{ route("admin.insuranceCompany.index") }}" class="nav-link {{ request()->is('admin/insurance_company') || request()->is('admin/insurance_company/*') ? 'active' : '' }}">
+                        <i class="fa-fw fas fa-user-tie nav-icon">
+
+                        </i>
+                        Insurance Company
+                    </a>
+                </li>
+            @endcan
             @can('agent_access')
                 <li class="nav-item">
                     <a href="{{ route("admin.agents.index") }}" class="nav-link {{ request()->is('admin/agents') || request()->is('admin/agents/*') ? 'active' : '' }}">

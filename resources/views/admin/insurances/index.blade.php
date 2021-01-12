@@ -9,21 +9,32 @@
         </div>
     </div>
 @endcan
+<!-- Appear only if there's renewal has not been done-->
+<div class="col-sm-12">
+    <div class="row floating_warning">
+        <i class="fas fa-bell fa-4x" style="color:white;"></i>
+        &nbsp;&nbsp;&nbsp;
+        <p style="font-size:18px;color:white;"><b>
+            REQUIRE ATTENTION<br>FOR INSURANCE OR POLICY RENEWAL
+        </b></p>
+    </div>        
+</div>
 <div class="card">
     <div class="card-header">
         {{ trans('cruds.insurance.title_singular') }} {{ trans('global.list') }}
-    </div>
-
+    </div>    
     <div class="card-body">
         <div class="table-responsive">
             <table class=" table table-bordered table-striped table-hover datatable datatable-insurance">
                 <thead>
                     <tr>
                         <th>&nbsp;</th>
-                        <th>Insurance Agent</th>
+                        <th width="5%">ID</th>
+                        <th>Agent</th>
                         <th width="10%">Policy Holder</th>
+                        <th>Insurance Company</th>
                         <th width="15%">Location</th>
-                        <th width="25%">Policy No.</th>                        
+                        <th width="25%">Policy No./Period</th>                        
                         <th width="15%">Sum Insured (RM)</th>
                         <th width="20%">Properties Insured</th>                       
                         <th>Modify</th>
@@ -33,13 +44,15 @@
                     @foreach($insurances as $key => $ins) 
                     <tr data-entry-id="{{ $ins->id }}">
                         <td></td>
+                        <td>{{ $ins->id }}</td>
                         <td>{{$ins->agent->agentDesc}}</td>
                         <td>{{$ins->company->compCode ?? '' }}</td>
+                        <td>{{$ins->insurance_company->ins_agent_desc}}</td>
                         <td>{{$ins->ins_correspond_address}}</td>                        
                         <td>
                           @foreach($ins->insurance_details as $key => $ins_details)
-                            {{$ins_details->policy_no}}<br>
-                            <span class="small text-primary">({{$ins_details->date_start}} to {{$ins_details->date_end}})</span>
+                            <span class="font-weight-bold">Policy No.</span>: {{$ins_details->policy_no}}<br>
+                            <span class="font-weight-bold">Policy Period</span>: {{$ins_details->date_start}} to {{$ins_details->date_end}}
                             <br>
                           @endforeach
                         </td>                       
@@ -71,9 +84,30 @@
                                 </form>
                             @endcan
                             @can('insurance_renew')
+                            <!-- check the date start and date end of the policy, show button if the date end within 30-50 days-->
+                                @php
+                                $mostRecent = 0;
+                                @endphp
+                                @foreach($ins->insurance_details as $key => $ins_details)
+                                    @php
+                                    $curDate = strtotime($ins_details->date_end)
+                                    @endphp
+                                    @if($curDate > $mostRecent)
+                                        @php
+                                        $mostRecent = $curDate;
+                                        @endphp
+                                    @endif
+                                @endforeach
+                                @php
+                                $today = strtotime(date('Y-m-d'));
+                                $dateDiff = $mostRecent - $today;
+                                $days = round($dateDiff / (60 * 60 * 24));
+                                @endphp
+                                @if($days <=50)
                                 <a class="btn btn-xs btn-warning renew_button" href="{{route('admin.insurances.renew', $ins->id) }}">
-                                    {{ trans('global.renew') }}
-                                </a>     
+                                <i class="fas fa-exclamation-triangle warning_button" style="color:red;"></i> {{ trans('global.renew') }} 
+                                </a>  
+                                @endif   
                             @endcan
                         </td>
                     </tr>

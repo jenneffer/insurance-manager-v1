@@ -69,15 +69,23 @@ $tabContent = "<div class='row form-group'>
 			@csrf
             @method('PUT')
             <div class="row form-group">
-                <div class="col-sm-4">
-                    <label for="title">Insurance Agent <span style="color:red;">*</span></label>
+                <div class="col-sm-3">
+                    <label for="title">Agent <span style="color:red;">*</span></label>
                     <select name="ins_agent" id="ins_agent" class="form-control select2">
                         @foreach($agent as $id => $ag)
                             <option value="{{ $id }}" {!! old('ins_agent', $insurance->ins_agent) == $id ? 'selected="selected"' : '' !!}>{{ $ag }}</option>
                         @endforeach
                     </select>  
                 </div>
-                <div class="col-sm-4 {{ $errors->has('company_id') ? 'has-error' : '' }}">
+                <div class="col-sm-3">
+                    <label for="title">Insurance Company <span style="color:red;">*</span></label>
+                    <select name="insurance_comp_id" id="insurance_comp_id" class="form-control select2">
+                        @foreach($insuranceCompany as $id => $ins_comp)
+                            <option value="{{ $id }}" {!! old('insurance_comp_id', $insurance->insurance_comp_id) == $id ? 'selected="selected"' : '' !!}>{{ $ins_comp }}</option>
+                        @endforeach
+                    </select>  
+                </div>
+                <div class="col-sm-3 {{ $errors->has('company_id') ? 'has-error' : '' }}">
                     <label for="company">Policy Holder <span style="color:red;">*</span></label>
                     <select name="company_id" id="company_id" class="form-control select2">
                         @foreach($company as $id => $comp)
@@ -91,7 +99,7 @@ $tabContent = "<div class='row form-group'>
                         </em>
                     @endif
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                     <label for="ins_class">Product <span style="color:red;">*</span></label>
                     <input name="ins_class" id="ins_class" class="form-control" value="{{ old('ins_class', isset($insurance) ? $insurance->ins_class : '') }}">
                 </div>
@@ -112,63 +120,63 @@ $tabContent = "<div class='row form-group'>
                 </div>  
             <!--self rating-->
             </div>
-            <!-- insurance by year-->
-            <ul class="nav nav-tabs" id="tabs" role="tablist">  
-                @foreach($ins_details as $key => $ins_data)               
+            <!-- insurance by year-->            
+            <ul class="nav nav-tabs" id="tabs" role="tablist">                 
+                @foreach($ins_details as $key => $ins_data)                                              
                 <li class="nav-item">
-                    <a class='nav-link {{ $key == $current_year ? "active" : "" }}' data-toggle='tab' id='{{$key}}' href='#tab-{{$key}}' role='tab' aria-controls="+id+" aria-selected='true'>YEAR {{$key}}</a>
+                    <a class='nav-link {{ $loop->last ? "active" : "" }}' data-toggle='tab' id='{{$key}}' href='#tab-{{$key}}' role='tab' aria-controls="+id+" aria-selected='true'>YEAR {{$key}}</a>
                 </li>   
                 @endforeach                          
             </ul>
-            <div class="tab-content" id="myTabContent">
-                @foreach($ins_details as $key => $ins_data)   
-                <input type="hidden" name="ins_details_id[{{$key}}]" value="{{$ins_data['id']}}">
-                <div class='tab-pane fade show {{ $key == $current_year ? "active" : "" }}' id='tab-{{$key}}' role='tabpanel' aria-labelledby='{{$key}}'> 
+            <div class="tab-content" id="myTabContent">            
+                @foreach($ins_details as $year => $ins_data) 
+                <input type="hidden" name="ins_details_id[{{$year}}]" value="{{$ins_data['id']}}">
+                <div class='tab-pane fade show {{ $loop->last ? "active" : "" }}' id='tab-{{$year}}' role='tabpanel' aria-labelledby='{{$key}}'> 
                     <div class='row form-group'>
                         <div class='col-sm-3'>
                             <label for='policy_no'>Policy No. <span style='color:red;'>*</span></label>
-                            <input name='policy_no[{{$key}}]' class='form-control' value="{{$ins_data['policy_no']}}">
+                            <input name='policy_no[{{$year}}]' class='form-control' value="{{$ins_data['policy_no']}}">
                         </div>
                         <div class='col-sm-3'>
                             <label for='date_start'>Date start<span style='color:red;'>*</span></label>
-                            <input name='date_start[{{$key}}]' class='form-control date'  value="{{$ins_data['date_start']}}">
+                            <input name='date_start[{{$year}}]' class='form-control date'  value="{{$ins_data['date_start']}}">
                         </div>
                         <div class='col-sm-3'>
                             <label for='date_end'>Date end<span style='color:red;'>*</span></label>
-                            <input name='date_end[{{$key}}]' class='form-control date'  value="{{$ins_data['date_end']}}">
+                            <input name='date_end[{{$year}}]' class='form-control date'  value="{{$ins_data['date_end']}}">
                         </div> 
                         <div class='col-sm-3'>
                             <label for='sum_insured'>Sum Insured(RM)<span style='color:red;'>*</span></label>
-                            <input name='sum_insured[{{$key}}]' class='form-control'  value="{{$ins_data['sum_insured']}}">
+                            <input name='sum_insured[{{$year}}]' class='form-control'  value="{{$ins_data['sum_insured']}}">
                         </div>                               
                     </div>                     
                     <div class='row form-group'>
                         <div class='col-sm-3'>
                             <label for='gross_premium'>Gross Premium(RM)</label>
-                            <input name='gross_premium[{{$key}}]' class='form-control' value="{{$ins_data['gross_premium']}}">
+                            <input name='gross_premium[{{$year}}]' class='form-control' value="{{number_format($ins_data['gross_premium'],2)}}">
                         </div>
                         <div class='col-sm-3'>
                             <label for='service_tax'>Service Tax(RM)</label>
-                            <input name='service_tax[{{$key}}]' class='form-control'  value="{{$ins_data['service_tax']}}">
+                            <input name='service_tax[{{$year}}]' class='form-control'  value="{{number_format($ins_data['service_tax'],2)}}">
                         </div>
                         <div class='col-sm-3'>
                             <label for='stamp_duty'>Stamp Duty(RM)</label>
-                            <input name='stamp_duty[{{$key}}]' class='form-control'  value="{{$ins_data['stamp_duty']}}">
+                            <input name='stamp_duty[{{$year}}]' class='form-control'  value="{{number_format($ins_data['stamp_duty'],2)}}">
                         </div>
                         <div class='col-sm-3'>
                             <label for='rate'>Rate(%)</label>
-                            <input name='rate[{{$key}}]' class='form-control' value="{{$ins_data['self_rating']}}">
+                            <input name='rate[{{$year}}]' class='form-control' value="{{number_format(floatval($ins_data['self_rating']),5)}}">
                         </div>                                
                     </div>  
 
                     <div class='row form-group'>                        
                         <div class='col-sm-6'>
                             <label for='remark'>Remark <span style='color:red;'>*</span></label>
-                            <textarea name='remark[{{$key}}]' class='form-control' rows="3">{{$ins_data['remark']}}</textarea>
+                            <textarea name='remark[{{$year}}]' class='form-control' rows="3">{{$ins_data['remark']}}</textarea>
                         </div>
                         <div class='col-sm-3'>
                             <label for='excess'>Excess</label>
-                            <input name='excess[{{$key}}]' class='form-control'  value="{{$ins_data['excess']}}">
+                            <input name='excess[{{$year}}]' class='form-control'  value="{{$ins_data['excess']}}">
                         </div>
                     </div>
                     <hr>  
@@ -240,22 +248,26 @@ $tabContent = "<div class='row form-group'>
                                     </thead>
                                     <tbody>   
                                     @foreach($perils[$risk_data->id] as $peril)
-                                        @foreach($peril as $data)                                                         
+                                        @foreach($peril as $key => $data)  
+                                            @foreach($data as $dat) 
+                                            @if($key == $year)                                                       
                                             <tr>
-                                                <td>{{$data->ref_no}}</td>
-                                                <td>{{$data->description}}</td>
-                                                <td class="text-right">{{$data->rate}}</td>
-                                                <td class="text-right">{{$data->sum_insured}}</td>
+                                                <td>{{$dat->ref_no}}</td>
+                                                <td>{{$dat->description}}</td>
+                                                <td class="text-right">{{$dat->rate}}</td>
+                                                <td class="text-right">{{$dat->sum_insured}}</td>
                                                 <td class="text-right">                                         
                                                     @can('perils_edit')
-                                                        <span id="{{$data->id}}" data-toggle="modal" class="edit_data_perils" data-target="#editItemPerils"><i class="fas fa-edit"></i></span>
+                                                        <span id="{{$dat->id}}" data-toggle="modal" class="edit_data_perils" data-target="#editItemPerils"><i class="fas fa-edit"></i></span>
                                                     @endcan
 
                                                     @can('perils_delete')
-                                                           <span id="{{$data->id}}" data-toggle="modal" class="delete_data_perils" data-target="#deleteItemPerils"><i class="fas fa-trash-alt"></i></span>
+                                                           <span id="{{$dat->id}}" data-toggle="modal" class="delete_data_perils" data-target="#deleteItemPerils"><i class="fas fa-trash-alt"></i></span>
                                                     @endcan
                                                 </td>
                                             </tr>
+                                            @endif
+                                            @endforeach
                                         @endforeach  
                                     @endforeach                          
                                     </tbody>
@@ -353,6 +365,9 @@ $tabContent = "<div class='row form-group'>
         var select_comp = $("#company_id").select2({
             selectOnClose: true
         });
+        var select_ins_comp = $("#insurance_comp_id").select2({
+            selectOnClose: true
+        });        
         //insurance id 
         var insurance_id = {!! json_encode($insurance->id) !!};
         //exisitng risk
@@ -364,6 +379,8 @@ $tabContent = "<div class='row form-group'>
         select_agent.data('select2').$selection.css('border', '1px solid #e4e7ea');     
         select_comp.data('select2').$selection.css('height', '35px');
         select_comp.data('select2').$selection.css('border', '1px solid #e4e7ea');    
+        select_ins_comp.data('select2').$selection.css('height', '35px');
+        select_ins_comp.data('select2').$selection.css('border', '1px solid #e4e7ea');
 
         //get the default first row        
         tabCounter = highest_index+1;        
@@ -419,7 +436,7 @@ $tabContent = "<div class='row form-group'>
                     data: insuranceData                    
                 },
                 success:function(response){
-                    // window.location=response.url;
+                    window.location=response.url;
                 },
             });
         }); 

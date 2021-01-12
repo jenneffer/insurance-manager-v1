@@ -23,7 +23,7 @@
                         <th>Id</th>
                         <th>Code</th>
                         <th>Name</th>                        
-                        <th></th>
+                        <th>Modify</th>
                     </tr>
                 </thead>
                 <tbody>
