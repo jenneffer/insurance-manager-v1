@@ -9,6 +9,7 @@
         </div>
     </div>
 @endcan
+@can('insurance_renew')
 <!-- Appear only if there's renewal has not been done-->
 <div class="col-sm-12">
     <div class="row floating_warning">
@@ -19,6 +20,7 @@
         </b></p>
     </div>        
 </div>
+@endcan
 <div class="card">
     <div class="card-header">
         {{ trans('cruds.insurance.title_singular') }} {{ trans('global.list') }}

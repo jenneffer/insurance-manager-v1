@@ -38,6 +38,6 @@ class CreateInsuranceDetails extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('insurance_renew');
+        Schema::dropIfExists('insurance_details');
     }
 }
