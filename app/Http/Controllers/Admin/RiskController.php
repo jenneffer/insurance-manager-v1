@@ -8,10 +8,11 @@ use App\Http\Controllers\Controller;
 // use App\Http\Requests\StoreExpenseCategoryRequest;
 // use App\Http\Requests\UpdateExpenseCategoryRequest;
 use Gate;
+use DB;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CompanyController extends Controller
+class RiskController extends Controller
 {
     public function index()
     {
@@ -75,5 +76,11 @@ class CompanyController extends Controller
         Risk::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function getLastId(){
+        $last_insert_id =  DB::table('risk')->orderBy('id', 'DESC')->first();
+        $id = $last_insert_id->id;
+        return $id;
     }
 }

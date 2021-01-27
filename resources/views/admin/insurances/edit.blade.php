@@ -147,7 +147,7 @@ $tabContent = "<div class='row form-group'>
                         </div> 
                         <div class='col-sm-3'>
                             <label for='sum_insured'>Sum Insured(RM)<span style='color:red;'>*</span></label>
-                            <input name='sum_insured[{{$year}}]' class='form-control'  value="{{$ins_data['sum_insured']}}">
+                            <input name='sum_insured[{{$year}}]' class='form-control'  value="{{number_format($ins_data['sum_insured'],2)}}">
                         </div>                               
                     </div>                     
                     <div class='row form-group'>
@@ -165,7 +165,7 @@ $tabContent = "<div class='row form-group'>
                         </div>
                         <div class='col-sm-3'>
                             <label for='rate'>Rate(%)</label>
-                            <input name='rate[{{$year}}]' class='form-control' value="{{number_format(floatval($ins_data['self_rating']),5)}}">
+                            <input name='rate[{{$year}}]' class='form-control' value="{{$ins_data['self_rating']}}">
                         </div>                                
                     </div>  
 
@@ -183,7 +183,7 @@ $tabContent = "<div class='row form-group'>
                     <ul class="nav nav-tabs" id="tabs" role="tablist">  
                         @foreach($risk as $key => $risk_data)               
                         <li class="nav-item">
-                            <a class='nav-link {{ $risk_data->id == $lowest_index ? "active" : "" }}' data-toggle='tab' id='{{$risk_data->id}}' href='#tab-{{$risk_data->id}}' role='tab' aria-controls="+id+" aria-selected='true'>RISK {{$key +1}}</a>
+                            <a class='nav-link {{ $loop->first ? "active" : "" }}' data-toggle='tab' id='{{$risk_data->id}}' href='#tab-{{$risk_data->id}}' role='tab' aria-controls="+id+" aria-selected='true'>RISK {{$key +1}}</a>
                         </li>   
                         @endforeach
                         <!-- <li class="nav-item">
@@ -192,9 +192,9 @@ $tabContent = "<div class='row form-group'>
                             </button>
                         </li>       -->    
                     </ul>
-                    <div class="tab-content" id="myTabContent">
+                    <div class="tab-content" id="myTabContent2">
                         @foreach($risk as $key => $risk_data)   
-                        <div class='tab-pane fade show {{ $risk_data->id == $lowest_index ? "active" : "" }}' id='tab-{{$risk_data->id}}' role='tabpanel' aria-labelledby='{{$risk_data->id}}'> 
+                        <div class='tab-pane fade show {{ $loop->first ? "active" : "" }}' id='tab-{{$risk_data->id}}' role='tabpanel' aria-labelledby='{{$risk_data->id}}'> 
                             <div class='row form-group'>
                                 <div class='col-sm-6'>
                                     <label for='risk_location'>Location <span style='color:red;'>*</span></label>
@@ -255,7 +255,7 @@ $tabContent = "<div class='row form-group'>
                                                 <td>{{$dat->ref_no}}</td>
                                                 <td>{{$dat->description}}</td>
                                                 <td class="text-right">{{$dat->rate}}</td>
-                                                <td class="text-right">{{$dat->sum_insured}}</td>
+                                                <td class="text-right">{{number_format($dat->sum_insured,2)}}</td>
                                                 <td class="text-right">                                         
                                                     @can('perils_edit')
                                                         <span id="{{$dat->id}}" data-toggle="modal" class="edit_data_perils" data-target="#editItemPerils"><i class="fas fa-edit"></i></span>
@@ -285,8 +285,13 @@ $tabContent = "<div class='row form-group'>
             <!-- Perils!-->      
              <!-- save form-->
             <div style="text-align: center;">
-                <input class="btn btn-danger" type="submit" value="{{ trans('global.update') }}">
-            </div>  	
+                <a style="margin-top:20px;" class="btn btn-default" href="{{ url()->previous() }}">
+                    {{ trans('global.back_to_list') }}
+                </a>
+                &nbsp;&nbsp;&nbsp;
+                <input type="submit" style="margin-top:20px;" class="btn btn-danger" value="{{ trans('global.update') }}"/>                                    
+            </div>  
+            	
         </form>
     </div>
 </div>
@@ -372,9 +377,7 @@ $tabContent = "<div class='row form-group'>
         var insurance_id = {!! json_encode($insurance->id) !!};
         //exisitng risk
         var risk_count = {!! json_encode($risk_count) !!};
-        //get the highest tab index
-        var highest_index = {!! json_encode($highest_index) !!};
-
+        
         select_agent.data('select2').$selection.css('height', '35px');
         select_agent.data('select2').$selection.css('border', '1px solid #e4e7ea');     
         select_comp.data('select2').$selection.css('height', '35px');
@@ -382,8 +385,7 @@ $tabContent = "<div class='row form-group'>
         select_ins_comp.data('select2').$selection.css('height', '35px');
         select_ins_comp.data('select2').$selection.css('border', '1px solid #e4e7ea');
 
-        //get the default first row        
-        tabCounter = highest_index+1;        
+        //get the default first row                     
         // addTab();
         var dummyTabCount = risk_count +1;
 
@@ -503,23 +505,23 @@ $tabContent = "<div class='row form-group'>
             });
         });
 
-        function addTab(){            
-            var id = "tab-" + tabCounter;
-            var liTabId = tabCounter;
+        // function addTab(){            
+        //     var id = "tab-" + tabCounter;
+        //     var liTabId = tabCounter;
 
-            $('#tabs a').removeClass('active');
-            $('.tab-pane').removeClass('active');
-            tabHTML = "<li class='nav-item'>";
-            tabHTML += "<a class='nav-link active' data-toggle='tab' id='"+liTabId+"' href='#"+id+"' role='tab' aria-controls="+id+" aria-selected='true'>RISK "+dummyTabCount+"</a><span>x</span>";
-            tabHTML += "</li>";
-            lastLI = $('.newTravelLegButton').closest('li');
-            $( tabHTML ).insertBefore( lastLI );
-            var riskTab = <?= json_encode(utf8_encode($tabContent))?>;  
-            var contentHTML = riskTab.replace( /{index}/g, tabCounter );       
-            $('.tab-content').append( "<div class='tab-pane fade show active' id='"+id+"' role='tabpanel' aria-labelledby='"+liTabId+"'>"+contentHTML+"</div>" );            
-            tabCounter++; 
-            dummyTabCount++;          
-        }   
+        //     $('#tabs a').removeClass('active');
+        //     $('.tab-pane').removeClass('active');
+        //     tabHTML = "<li class='nav-item'>";
+        //     tabHTML += "<a class='nav-link active' data-toggle='tab' id='"+liTabId+"' href='#"+id+"' role='tab' aria-controls="+id+" aria-selected='true'>RISK "+dummyTabCount+"</a><span>x</span>";
+        //     tabHTML += "</li>";
+        //     lastLI = $('.newTravelLegButton').closest('li');
+        //     $( tabHTML ).insertBefore( lastLI );
+        //     var riskTab = <?= json_encode(utf8_encode($tabContent))?>;  
+        //     var contentHTML = riskTab.replace( /{index}/g, tabCounter );       
+        //     $('.tab-content').append( "<div class='tab-pane fade show active' id='"+id+"' role='tabpanel' aria-labelledby='"+liTabId+"'>"+contentHTML+"</div>" );            
+        //     tabCounter++; 
+        //     dummyTabCount++;          
+        // }   
 
         function addRowPerils(index){   
             var indexPerilsObj = {};           

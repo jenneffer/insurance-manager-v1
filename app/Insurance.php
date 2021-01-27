@@ -25,7 +25,8 @@ class Insurance extends Model
         'ins_correspond_address',
         'ins_issuing_branch',
         'ins_issuing_date',
-        'ins_mortgagee'
+        'ins_mortgagee',
+        'insurance_comp_id'
     ];
 
     public function insurance_details(){

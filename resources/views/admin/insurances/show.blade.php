@@ -107,8 +107,9 @@
                             <div class="col-sm-3"> {{ $ins_data['remark']}}</div>
                         </div>
                         <hr>
-                        <!-- Show the policy risk !-->
-                        @foreach($insurance->risk as $key => $risk)                
+                        <!-- Show the policy risk based on the renewal year. Please refer to renewal_item_controller table !-->
+                        @foreach($insurance->risk as $key => $risk) 
+                        @if($risk->year == $year)              
                             <div class="form-group col-sm-12">
                                 <div class="col-sm-12" style="background-color: #b0e8f7;">
                                     <label><strong>Risk No. {{$risk->risk_riskno}}</strong></label> 
@@ -133,14 +134,14 @@
                                         @foreach($insurance->perils[$risk->id] as $perils)
                                             @foreach($perils as $key => $data)  
                                                 @foreach($data as $dat)   
-                                                @if($key == $year)                                         
-                                                 <tr>
-                                                    <td>{{$dat->ref_no}}</td>
-                                                    <td>{{$dat->description}}</td>
-                                                    <td class="text-right">{{$dat->rate}}</td>
-                                                    <td class="text-right">{{number_format($dat->sum_insured,2)}}</td>                         
-                                                </tr>
-                                                @endif
+                                                    @if($key == $year)                                         
+                                                    <tr>
+                                                        <td>{{$dat->ref_no}}</td>
+                                                        <td>{{$dat->description}}</td>
+                                                        <td class="text-right">{{$dat->rate}}</td>
+                                                        <td class="text-right">{{number_format($dat->sum_insured,2)}}</td>                         
+                                                    </tr>
+                                                    @endif
                                                 @endforeach
                                             @endforeach
                                         @endforeach                                                            
@@ -154,7 +155,8 @@
                                     </tfoot>
                                 </table>    
                             </div>   
-                            <hr>                                                       
+                            <hr>    
+                        @endif                                                   
                         @endforeach
                         <!-- Interest Insured!-->
                         <a style="margin-top:20px;" class="btn btn-default" href="{{ url()->previous() }}">

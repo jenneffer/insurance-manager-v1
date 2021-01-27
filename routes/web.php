@@ -31,6 +31,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('/perils/retrieve', 'InsuranceController@showPerils')->name('insurances.showPerils');
     Route::post('/perils/update', 'InsuranceController@updatePerils')->name('insurances.updatePerils'); 
 
+    //get the last id of risk table
+    Route::post('/risk/get_last_id', 'RiskController@getLastId')->name('risk.getLastId');
+
 
 
     Route::resource('insurance_details', 'InsuranceDetailsController');

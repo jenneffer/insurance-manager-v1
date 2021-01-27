@@ -33,11 +33,10 @@ class InsuranceDetailsController extends Controller
             
         }
         $risk_count = count($arr_risk_id);   
-        //get the lowest and highest tab index  
-        $lowest_index = min($arr_risk_id);
-        $highest_index = max($arr_risk_id);
-
-    	return view('admin.insurances.renew_with_addition',compact('risk','perils','risk_count','lowest_index','highest_index','ins_id'));
+        //get the risk table last id
+        $riskTableLastId = $this->getRiskTableLastId() + 1;
+        
+        return view('admin.insurances.renew_with_addition',compact('risk','perils','risk_count','ins_id','riskTableLastId'));
     }
 
     public function renew_without_addition(Request $request){
@@ -45,8 +44,7 @@ class InsuranceDetailsController extends Controller
     	return view('admin.insurances.renew_without_addition', compact('ins_id'));
     }
 
-    public function update_renewal
-    ( Request $request ){ //renewal without addition
+    public function update_renewal( Request $request ){ //renewal without addition
         $ins_id = $request->ins_id;
         $data = $request->data;
         $param = array();
@@ -85,7 +83,22 @@ class InsuranceDetailsController extends Controller
         //additional risk
         $risk_location = $param['risk_location'];
         $risk_address = $param['risk_address'];
-        $properties_insured = $param['properties_insured'];
+        $risk_description = $param['properties_insured'];
+        $i = 0;
+        foreach($risk_location as $riskId => $riskData){
+            $i++;
+            $risk_data = array (
+                'ins_id' => $ins_id,
+                'risk_riskno' => $i,
+                'risk_location' => $risk_location[$riskId],
+                'risk_address' => $risk_address[$riskId],
+                'risk_description' => $risk_description[$riskId],                
+            );   
+            //insert into risk table -update if exist, insert if not exist
+            $risk = Risk::updateOrCreate($risk_data);
+        }
+
+        
 
         //additional item 
         $perils = json_decode($param['perils']);      
@@ -130,5 +143,11 @@ class InsuranceDetailsController extends Controller
         ]);
 
         return response()->json(['url'=>url('/admin/insurances')]);   
+    }
+
+    public function getRiskTableLastId(){
+        $last_insert_id =  DB::table('risk')->orderBy('id', 'DESC')->first();
+        $id = $last_insert_id->id;
+        return $id;
     }
 }

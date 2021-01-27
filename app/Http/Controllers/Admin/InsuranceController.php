@@ -46,6 +46,7 @@ class InsuranceController extends Controller
         $data = $request->all(); //form data
         $param = array();
         parse_str($data['data'], $param); //unserialize jquery string data  
+
         //insert into insurance table       
         $token = $param['_token'];
         $insurance_table = [
@@ -86,9 +87,9 @@ class InsuranceController extends Controller
         $risk_count = count($risk_address);
         $risk_description = $param['properties_insured'];
         
-        for ($i=1; $i <=$risk_count ; $i++) {
+        for ($i=1; $i <=$risk_count ; $i++) {            
             $risk_data = array (
-                'ins_id' => $lastInsertID,
+                'ins_id' => $insurance_details->insurance_id,
                 'risk_riskno' => $i,
                 'risk_location' => $risk_location[$i],
                 'risk_address' => $risk_address[$i],
@@ -116,9 +117,11 @@ class InsuranceController extends Controller
                     
             //     }
             // }
+            $additional_items_id = [];
             $perils = json_decode($param['perils']);  
             foreach ($perils as $key => $value) {
                 # code...
+               
                 foreach ($value as $risk_tab_id => $risk_data_perils) {
                     # code...
                     if($i == $risk_tab_id ){
@@ -130,12 +133,27 @@ class InsuranceController extends Controller
                             'sum_insured' => $risk_data_perils->ins_sum_insured,
                             'policy_no' => $param['ins_policy_no'] 
                         );
-
+                        
                         $perils = Perils::create($perilsData);    
-                    }
-                    
+                        //kumpul id utk dimasukkan dalam table renewal_item_controller based on the current year
+                        //get the last insert id
+                        $perilslastInsertID = $perils->id;                         
+                        $additional_items_id[$riskLastInsertID][] = $perilslastInsertID;
+                    }                    
                 }
             }  
+            //insert into renewal_item_controller
+            //implode additional_items_id & risk_tab_id
+            $items_id = implode(",", $additional_items_id[$riskLastInsertID]);
+            //get year of date start
+            $ds_year = date('Y', strtotime($param['ins_date_start']));
+            DB::table('renewal_item_controller')->insert([
+                'ins_id' => $insurance_details->insurance_id,
+                'year' =>$ds_year,
+                'risk_id' => $riskLastInsertID,
+                'item_id' => $items_id,
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
         }
 
         // return redirect()->route('admin.insurances.index');
@@ -181,7 +199,6 @@ class InsuranceController extends Controller
             );
                 
         }   
-
         // foreach ($risk as $key => $value) {
 
         //     $risk_id = $value->id;
@@ -190,26 +207,30 @@ class InsuranceController extends Controller
         //     $perils[$risk_id][] = DB::table('additional_ins_item')->where('risk_id','=', $risk_id)->whereNull('deleted_at')->get();
             
         // }
-        $perils = [];
-        foreach ($risk as $key => $value) {            
+        $perils = [];        
+        foreach ($risk as $key => $value) { 
+                   
             $risk_id = $value->id;
+            
             $arr_risk_id[] = $risk_id;
-            $renewal_item_c = DB::table('renewal_item_controller')->where('ins_id', '=', $value->ins_id)->get();
+            $renewal_item_c = DB::table('renewal_item_controller')
+                                    ->where('risk_id', '=', $risk_id)
+                                    ->get();
+
             $perils_item = [];
             foreach($renewal_item_c as $items){
                 $item_id = explode(",",$items->item_id);
                 //form items array
                 $perils_item[$items->year] = DB::table('additional_ins_item')->where('risk_id','=', $risk_id)->whereIn('id',$item_id)->whereNull('deleted_at')->get();
                 
-            }                       
+            }  
+                                          
             $perils[$risk_id][] = $perils_item;
-        }
+        }         
         $risk_count = count($arr_risk_id);   
         //get the lowest and highest tab index  
-        $lowest_index = min($arr_risk_id);
-        $highest_index = max($arr_risk_id);
 
-        return view('admin.insurances.edit', compact('company','agent','insurance','ins_details','current_year','risk','perils','risk_count','lowest_index','highest_index', 'insuranceCompany'));
+        return view('admin.insurances.edit', compact('company','agent','insurance','ins_details','current_year','risk','perils','risk_count', 'insuranceCompany'));
     }
 
     public function update(UpdateInsuranceRequest $request, Insurance $insurance)
@@ -253,10 +274,10 @@ class InsuranceController extends Controller
                 'policy_no' => $arr_policy_no[$key],
                 'date_start' => $arr_date_start[$key],
                 'date_end' => $arr_date_end[$key],
-                'sum_insured' => $arr_sum_insured[$key],
-                'gross_premium' => $arr_gross_premium[$key],
-                'service_tax' => $arr_service_tax[$key],
-                'stamp_duty' => $arr_stamp_duty[$key],
+                'sum_insured' => str_replace(",", "", $arr_sum_insured[$key]),
+                'gross_premium' => str_replace(",", "", $arr_gross_premium[$key]),
+                'service_tax' => str_replace(",", "", $arr_service_tax[$key]),
+                'stamp_duty' => str_replace(",", "", $arr_stamp_duty[$key]),
                 'self_rating' => $arr_rate[$key],
                 'remark' => $arr_remark[$key],
                 'excess' => $arr_excess[$key],
@@ -343,7 +364,6 @@ class InsuranceController extends Controller
         abort_if(Gate::denies('insurance_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $insurance->load('insurance_details', 'created_by');
         $ins_details = [];//form array by year
-        $current_year = date("Y");
         foreach ($insurance->insurance_details as $key => $value) {
             # code...        
             $year = date('Y', strtotime($value->date_start));
@@ -366,27 +386,38 @@ class InsuranceController extends Controller
         
         //get risk
         
-        $risk = DB::table('risk')->where('ins_id', '=', $insurance->id)->get();
-        // $interest_insured = [];
-        $perils = [];
-        foreach ($risk as $key => $value) {            
-            $risk_id = $value->id;
-            $renewal_item_c = DB::table('renewal_item_controller')->where('ins_id', '=', $value->ins_id)->get();
-            $perils_item = [];
-            foreach($renewal_item_c as $items){
-                $item_id = explode(",",$items->item_id);
-                //form items array
-                $perils_item[$items->year] = DB::table('additional_ins_item')->where('risk_id','=', $risk_id)->whereIn('id',$item_id)->whereNull('deleted_at')->get();
+        // $risk = DB::table('risk')->where('ins_id', '=', $insurance->id)->get();
+        // // $interest_insured = [];
+        // $perils = [];
+        // foreach ($risk as $key => $value) {            
+        //     $risk_id = $value->id;
+        //     $renewal_item_c = DB::table('renewal_item_controller')->where('ins_id', '=', $value->ins_id)->get();
+        //     $perils_item = [];
+        //     foreach($renewal_item_c as $items){
+        //         $item_id = explode(",",$items->item_id);
+        //         //form items array
+        //         $perils_item[$items->year] = DB::table('additional_ins_item')->where('risk_id','=', $risk_id)->whereIn('id',$item_id)->whereNull('deleted_at')->get();
                 
-            }                       
-            $perils[$risk_id][] = $perils_item;
-        }
+        //     }                       
+        //     $perils[$risk_id][] = $perils_item;
+        // }
 
+        $risk = DB::table('renewal_item_controller')
+                    ->join('risk','renewal_item_controller.risk_id','=','risk.id')
+                    ->select('renewal_item_controller.year','renewal_item_controller.item_id','risk.*')
+                    ->where('risk.ins_id','=',$insurance->id)->get();
+
+        foreach($risk as $key => $value){
+            $risk_id = $value->id;  
+            $renewal_item_c = explode(',', $value->item_id);   
+            $perils_item[$value->year] = DB::table('additional_ins_item')->where('risk_id','=', $risk_id)->whereIn('id',$renewal_item_c)->whereNull('deleted_at')->get();
+            $perils[$risk_id][] = $perils_item;                        
+        }
         $insurance['risk'] = $risk;
         // $insurance['interest_insured'] = $interest_insured;
         $insurance['perils'] = $perils;
         $insurance['ins_details'] = $ins_details;               
-        return view('admin.insurances.show',compact('insurance','current_year'));
+        return view('admin.insurances.show',compact('insurance'));
     }
 
     public function destroy(Insurance $insurance)

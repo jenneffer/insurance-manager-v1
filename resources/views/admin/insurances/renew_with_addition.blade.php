@@ -99,7 +99,7 @@ $tabContent = "<div class='row form-group'>
             <ul class="nav nav-tabs" id="tabs" role="tablist"> 
                 @foreach($risk as $key => $risk_data)               
                 <li class="nav-item">
-                    <a class='nav-link {{ $risk_data->id == $lowest_index ? "active" : "" }}' data-toggle='tab' id='{{$risk_data->id}}' href='#tab-{{$risk_data->id}}' role='tab' aria-controls="+id+" aria-selected='true'>RISK {{$key +1}}</a>
+                    <a class='nav-link {{ $loop->first ? "active" : "" }}' data-toggle='tab' id='{{$risk_data->id}}' href='#tab-{{$risk_data->id}}' role='tab' aria-controls="+id+" aria-selected='true'>RISK {{$key +1}}</a>
                 </li>   
                 @endforeach                
                 <li class="nav-item">
@@ -111,7 +111,7 @@ $tabContent = "<div class='row form-group'>
             <div class="tab-content" id="myTabContent">  
                 <input type="hidden" name="risk_id" value="{{$risk_data->id}}">               
                 @foreach($risk as $key => $risk_data) 
-                <div class='tab-pane fade show {{ $risk_data->id == $lowest_index ? "active" : "" }}' id='tab-{{$risk_data->id}}' role='tabpanel' aria-labelledby='{{$risk_data->id}}'> 
+                <div class='tab-pane fade show {{ $loop->first ? "active" : "" }}' id='tab-{{$risk_data->id}}' role='tabpanel' aria-labelledby='{{$risk_data->id}}'> 
                     <div class='row form-group'>                        
                         <div class='col-sm-6'>
                             <label for='risk_location'>Location<span style='color:red;'>*</span></label>
@@ -204,9 +204,12 @@ $tabContent = "<div class='row form-group'>
     $(document).ready(function(){    
         var risk_count = {!! json_encode($risk_count) !!};
         //get the highest tab index
-        var highest_index = {!! json_encode($highest_index) !!};
-        //get the default first row              
-        tabCounter = highest_index+1;        
+        var riskTableLastId = {!! json_encode($riskTableLastId) !!};
+        //get the last id of table risk
+        //get the default first row   
+
+        tabCounter = riskTableLastId+1;    
+        
         var dummyTabCount = risk_count +1;
 
         var tabs = $( "#tabs" ).tab();
@@ -253,7 +256,8 @@ $tabContent = "<div class='row form-group'>
                     window.location=response.url;
                 },
             });
-        });    
+        });  
+  
         function addRowPerils(index){   
             var indexPerilsObj = {};           
             var code = $("input[name=ins_code\\["+index+"\\]]").val();
@@ -277,7 +281,6 @@ $tabContent = "<div class='row form-group'>
         function addTab(){            
             var id = "tab-" + tabCounter;
             var liTabId = tabCounter;
-
             $('#tabs a').removeClass('active');
             $('.tab-pane').removeClass('active');
             tabHTML = "<li class='nav-item'>";
