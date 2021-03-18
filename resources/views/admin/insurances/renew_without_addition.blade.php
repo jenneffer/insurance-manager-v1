@@ -7,7 +7,12 @@
     </div>
     <div class="card-body">
         <form name='InsuranceRenewalForm' id='InsuranceRenewalForm'>
-            @csrf            
+            @csrf    
+            <div class="row form-group">
+                <div class="col-sm-6">
+                    <label for="ins_policy_no" class="text-muted">Previous Policy No. : </label><span class="text-muted"> {{$prevPolicyNo}}</span>                    
+                </div> 
+            </div>         
             <div class="row form-group">
                 <div class="col-sm-6">
                     <label for="ins_policy_no">Policy No. <span style="color:red;">*</span></label>
@@ -56,14 +61,14 @@
         $('#InsuranceRenewalForm').on('submit',function(event){           
             event.preventDefault();
             var insuranceData = $('#InsuranceRenewalForm').serialize();    
-            var insurance_id = {!! json_encode($ins_id) !!};        
+            var insurance_details_id = {!! json_encode($ins_details_id) !!};        
             $.ajax({
                 url: "/admin/insurance/update_renewal",
                 type:"POST",               
                 data:{
                     "_token": "{{ csrf_token() }}",
                     data: insuranceData,
-                    ins_id: insurance_id                    
+                    ins_details_id: insurance_details_id                    
                 },                
                 success:function(response){
                     window.location=response.url;

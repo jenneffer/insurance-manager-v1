@@ -83,4 +83,10 @@ class UsersController extends Controller
 
         return response(null, Response::HTTP_NO_CONTENT);
     }
+
+    public static function getUsernameSession($user_id){ 
+
+        $results = User::where(['id' => $user_id])->first();
+        return $results;
+    }
 }

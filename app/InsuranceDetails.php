@@ -52,4 +52,8 @@ class InsuranceDetails extends Model
     {
         return $this->belongsTo(User::class, 'created_by_id');
     }
+    
+    public function scopeInactive($query){
+        return $query->where('policy_status','!=','inactive');
+    }
 }

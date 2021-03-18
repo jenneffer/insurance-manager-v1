@@ -22,7 +22,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     //Insurance - 20200803 by Jenn
     Route::delete('insurances/destroy', 'InsuranceController@massDestroy')->name('insurances.massDestroy');
     Route::resource('insurances', 'InsuranceController');
-    //insurance renew
+    //insurance 
     Route::post('/insurance/add', 'InsuranceController@store')->name('insurances.store');
     Route::post('/insurance/update', 'InsuranceController@update')->name('insurances.update');
     // Route::post('/insurance/renew', 'InsuranceController@renew')->name('insurances.renew');
@@ -34,12 +34,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     //get the last id of risk table
     Route::post('/risk/get_last_id', 'RiskController@getLastId')->name('risk.getLastId');
 
-
-
+    //Insurance renew
     Route::resource('insurance_details', 'InsuranceDetailsController');
-    Route::get('/insurance/renew/{id}','InsuranceDetailsController@index')->name('insurances.renew');
-    Route::get('/insurance/renew_without_addition/{id}', 'InsuranceDetailsController@renew_without_addition')->name('insurances.renew_without_addition');
-    Route::get('/insurance/renew_with_addition/{id}', 'InsuranceDetailsController@renew_with_addition')->name('insurances.renew_with_addition');
+    Route::get('/insurance/renew/{id}/{ins_details_id}','InsuranceDetailsController@index')->name('insurances.renew');
+    Route::get('/insurance/renew_without_addition/{id}/{ins_details_id}', 'InsuranceDetailsController@renew_without_addition')->name('insurances.renew_without_addition');
+    Route::get('/insurance/renew_with_addition/{id}/{ins_details_id}', 'InsuranceDetailsController@renew_with_addition')->name('insurances.renew_with_addition');
     Route::post('/insurance/update_renewal', 'InsuranceDetailsController@update_renewal')->name('insurances.update_renewal'); //update renewal without addition
     Route::post('/insurance/update_renewal_add', 'InsuranceDetailsController@update_renewal_add')->name('insurances.update_renewal_add'); //update renewal with addition
     //Company
@@ -66,6 +65,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     //insurance company
     Route::delete('insuranceCompany/destroy', 'InsuranceCompanyController@massDestroy')->name('insuranceCompany.massDestroy');
     Route::resource('insuranceCompany', 'InsuranceCompanyController');
-    
+
+    //payments
+    Route::delete('payments/destroy', 'PaymentController@massDestroy')->name('payments.massDestroy');     
+    Route::resource('payments', 'PaymentController');
+    Route::get('/payments/create/{id}/{ins_details_id}','PaymentController@create')->name('payments.create');
+    Route::get('/payments/show/{id}/{ins_details_id}','PaymentController@show')->name('payments.show');
 
 });

@@ -107,7 +107,7 @@ $tabContent = "<div class='row form-group'>
             </div>
             <div class="row form-group">
                 <div class="col-sm-6">
-                    <label for="ins_correspond_address">Correspondence Address <span style="color:red;">*</span></label>
+                    <label for="ins_correspond_address">Correspondence Address</label>
                     <input name="ins_correspond_address" id="ins_correspond_address" class="form-control" value="{{ old('ins_correspond_address', isset($insurance) ? $insurance->ins_correspond_address : '') }}">
                 </div>
                 <div class="col-sm-3">
@@ -171,12 +171,21 @@ $tabContent = "<div class='row form-group'>
 
                     <div class='row form-group'>                        
                         <div class='col-sm-6'>
-                            <label for='remark'>Remark <span style='color:red;'>*</span></label>
+                            <label for='remark'>Remark</label>
                             <textarea name='remark[{{$year}}]' class='form-control' rows="3">{{$ins_data['remark']}}</textarea>
                         </div>
                         <div class='col-sm-3'>
                             <label for='excess'>Excess</label>
                             <input name='excess[{{$year}}]' class='form-control'  value="{{$ins_data['excess']}}">
+                        </div>
+                        <div class='col-sm-3'>
+                            <label for='policy_status'>Policy Status</label>
+                            <select name="policy_status[{{$year}}]" id="policy_status" class="form-control select2">
+                            @foreach($arr_policy_status as $key => $value)
+                                <!-- <option value="{{ $id }}" {{ (isset($insurance) && $insurance->comp ? $insurance->comp->id : old('ins_company')) == $id ? 'selected' : '' }}>{{ $comp }}</option> -->
+                                <option value="{{ $key }}" {!! old('policy_status', $ins_data['policy_status']) == $key ? 'selected="selected"' : '' !!}>{{ $value }}</option>
+                            @endforeach
+                            </select>                            
                         </div>
                     </div>
                     <hr>  
@@ -372,7 +381,11 @@ $tabContent = "<div class='row form-group'>
         });
         var select_ins_comp = $("#insurance_comp_id").select2({
             selectOnClose: true
-        });        
+        });     
+
+        var select_policyStatus = $("#policy_status").select2({
+            selectOnClose: true
+        });   
         //insurance id 
         var insurance_id = {!! json_encode($insurance->id) !!};
         //exisitng risk
@@ -384,6 +397,8 @@ $tabContent = "<div class='row form-group'>
         select_comp.data('select2').$selection.css('border', '1px solid #e4e7ea');    
         select_ins_comp.data('select2').$selection.css('height', '35px');
         select_ins_comp.data('select2').$selection.css('border', '1px solid #e4e7ea');
+        select_policyStatus.data('select2').$selection.css('height', '35px');
+        select_policyStatus.data('select2').$selection.css('border', '1px solid #e4e7ea');
 
         //get the default first row                     
         // addTab();

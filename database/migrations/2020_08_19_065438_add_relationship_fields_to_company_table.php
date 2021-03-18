@@ -14,9 +14,9 @@ class AddRelationshipFieldsToCompanyTable extends Migration
     public function up()
     {
         Schema::table('company', function (Blueprint $table) {
-            $table->unsignedInteger('created_by_id')->nullable();
+            // $table->unsignedInteger('created_by_id')->nullable();
 
-            $table->foreign('created_by_id', 'created_by_fk_00003')->references('id')->on('users');
+            // $table->foreign('created_by_id', 'created_by_fk_00003')->references('id')->on('users');
         });
     }
 }

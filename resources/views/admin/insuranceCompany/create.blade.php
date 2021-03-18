@@ -3,28 +3,28 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.create') }} Agent
+        {{ trans('global.create') }} Insurance Company
     </div>
 
     <div class="card-body">
-        <form action="{{ route("admin.agents.store") }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route("admin.insuranceCompany.store") }}" method="POST" enctype="multipart/form-data">
             @csrf            
-            <div class="form-group {{ $errors->has('agentCode') ? 'has-error' : '' }}">
-                <label for="agentCode">Code *</label>
-                <input type="text" id="agentCode" name="agentCode" class="form-control" value="{{ old('agentCode', isset($agent) ? $agent->agentCode : '') }}" required>
-                @if($errors->has('agentCode'))
+            <div class="form-group {{ $errors->has('ins_agent_code') ? 'has-error' : '' }}">
+                <label for="ins_agent_code">Code *</label>
+                <input type="text" id="ins_agent_code" name="ins_agent_code" class="form-control" value="{{ old('ins_agent_code', isset($insuranceCompany) ? $insuranceCompany->ins_agent_code : '') }}" required>
+                @if($errors->has('ins_agent_code'))
                     <em class="invalid-feedback">
-                        {{ $errors->first('agentCode') }}
+                        {{ $errors->first('ins_agent_code') }}
                     </em>
                 @endif
                 <p class="helper-block"></p>
             </div>
-            <div class="form-group {{ $errors->has('agentDesc') ? 'has-error' : '' }}">
-                <label for="agentDesc">Name *</label>
-                <input type="text" id="agentDesc" name="agentDesc" class="form-control" value="{{ old('agentDesc', isset($agent) ? $agent->agentDesc : '') }}" required>
-                @if($errors->has('agentDesc'))
+            <div class="form-group {{ $errors->has('ins_agent_desc') ? 'has-error' : '' }}">
+                <label for="ins_agent_desc">Name *</label>
+                <input type="text" id="ins_agent_desc" name="ins_agent_desc" class="form-control" value="{{ old('ins_agent_desc', isset($insuranceCompany) ? $insuranceCompany->ins_agent_desc : '') }}" required>
+                @if($errors->has('ins_agent_desc'))
                     <em class="invalid-feedback">
-                        {{ $errors->first('agentDesc') }}
+                        {{ $errors->first('ins_agent_desc') }}
                     </em>
                 @endif
                 <p class="helper-block"></p>

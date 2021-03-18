@@ -167,6 +167,26 @@ table.dataTable thead .sorting_desc {
   animation: blink 2s steps(5, start) infinite;
   -webkit-animation: blink 1s steps(5, start) infinite;
 }
+.need_payment {
+    animation: blink 2s steps(5, start) infinite;
+    -webkit-animation: blink 1s steps(5, start) infinite;
+}
+
+.table-1 {
+    border-collapse:separate;
+    border-spacing: 10px;
+}
+.table-content {
+    border: 1px solid black;
+    border-collapse:collapse;
+    padding: 8px;    
+}
+.serial_no_line {
+    border-bottom-style: solid;
+    border-bottom-width: thin;
+    width:80%;
+}
+
 @keyframes blink {
   to {
 	visibility: hidden;
@@ -186,6 +206,19 @@ table.dataTable thead .sorting_desc {
 	padding: 20px;
 	animation: blink 2s steps(5, start) infinite;
 	-webkit-animation: blink 1s steps(5, start) infinite;
+}
+
+@media print {
+body { 
+    font-size: 16pt;
+    margin: 0px; 
+    }
+}
+@media screen {
+body { font-size: 13px }
+}
+@media screen, print {
+body { line-height: 1.2 }
 }
 
 

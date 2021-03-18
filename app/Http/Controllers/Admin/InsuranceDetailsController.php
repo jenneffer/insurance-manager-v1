@@ -16,12 +16,14 @@ class InsuranceDetailsController extends Controller
     public function index(Request $request)
     {
         abort_if(Gate::denies('insurance_renew'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $ins_id = $request->id;                   
-        return view('admin.insurances.renew', compact('ins_id'));
+        $ins_id = $request->id; 
+        $ins_details_id = $request->ins_details_id;                  
+        return view('admin.insurances.renew', compact('ins_id','ins_details_id'));
     }
 
     public function renew_with_addition(Request $request){
         $ins_id = $request->id;
+        $ins_details_id = $request->ins_details_id;
         $risk = DB::table('risk')->where('ins_id', '=', $request->id)->get();    
         $perils = [];
         $arr_risk_id = [];
@@ -35,13 +37,18 @@ class InsuranceDetailsController extends Controller
         $risk_count = count($arr_risk_id);   
         //get the risk table last id
         $riskTableLastId = $this->getRiskTableLastId() + 1;
+        //get previous policy number
+        $prevPolicyNo = $this->getPolicyNumber($ins_details_id);
         
-        return view('admin.insurances.renew_with_addition',compact('risk','perils','risk_count','ins_id','riskTableLastId'));
+        return view('admin.insurances.renew_with_addition',compact('risk','perils','risk_count','ins_id','ins_details_id','riskTableLastId','prevPolicyNo'));
     }
 
     public function renew_without_addition(Request $request){
         $ins_id = $request->id;
-    	return view('admin.insurances.renew_without_addition', compact('ins_id'));
+        $ins_details_id = $request->ins_details_id;
+        //get previous policy number
+        $prevPolicyNo = $this->getPolicyNumber($ins_details_id);
+    	return view('admin.insurances.renew_without_addition', compact('ins_id','ins_details_id','prevPolicyNo'));
     }
 
     public function update_renewal( Request $request ){ //renewal without addition
@@ -149,5 +156,10 @@ class InsuranceDetailsController extends Controller
         $last_insert_id =  DB::table('risk')->orderBy('id', 'DESC')->first();
         $id = $last_insert_id->id;
         return $id;
+    }
+
+    public static function getPolicyNumber($ins_details_id){
+        $result = DB::table('insurance_details')->select('policy_no')->where('id', $ins_details_id)->first();           
+        return $result->policy_no;     
     }
 }

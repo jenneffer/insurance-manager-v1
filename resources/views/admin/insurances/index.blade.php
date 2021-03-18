@@ -9,9 +9,9 @@
         </div>
     </div>
 @endcan
-@can('insurance_renew')
+<!-- @can('insurance_renew') -->
 <!-- Appear only if there's renewal has not been done-->
-<div class="col-sm-12">
+<!-- <div class="col-sm-12">
     <div class="row floating_warning">
         <i class="fas fa-bell fa-4x" style="color:white;"></i>
         &nbsp;&nbsp;&nbsp;
@@ -20,7 +20,7 @@
         </b></p>
     </div>        
 </div>
-@endcan
+@endcan -->
 <div class="card">
     <div class="card-header">
         {{ trans('cruds.insurance.title_singular') }} {{ trans('global.list') }}
@@ -31,49 +31,51 @@
                 <thead>
                     <tr>
                         <th>&nbsp;</th>
-                        <th width="5%">ID</th>
+                        <th>ID</th>
                         <th>Agent</th>
-                        <th width="10%">Policy Holder</th>
+                        <th>Policy Holder/Owner</th>
                         <th>Insurance Company</th>
-                        <th width="15%">Location</th>
-                        <th width="25%">Policy No./Period</th>                        
-                        <th width="15%">Sum Insured (RM)</th>
-                        <th width="20%">Properties Insured</th>                       
+                        <th>Class of Insurance</th>    
+                        <th>Location/Properties Insured</th>
+                        <th>Policy No.</th>   
+                        <th>Insurance Period</th>                      
+                        <th>Sum Insured (RM)</th>   
+                        <th>Remark</th>       
+                        <th>Policy Status</th>      
+                        <th>Payment Status</th>                                    
                         <th>Modify</th>
                     </tr>                    
                 </thead>
                 <tbody>
+                @if(!empty($insurances))
                     @foreach($insurances as $key => $ins) 
                     <tr data-entry-id="{{ $ins->id }}">
                         <td></td>
-                        <td>{{ $ins->id }}</td>
-                        <td>{{$ins->agent->agentDesc}}</td>
-                        <td>{{$ins->company->compCode ?? '' }}</td>
-                        <td>{{$ins->insurance_company->ins_agent_desc}}</td>
-                        <td>{{$ins->ins_correspond_address}}</td>                        
-                        <td>
-                          @foreach($ins->insurance_details as $key => $ins_details)
-                            <span class="font-weight-bold">Policy No.</span>: {{$ins_details->policy_no}}<br>
-                            <span class="font-weight-bold">Policy Period</span>: {{$ins_details->date_start}} to {{$ins_details->date_end}}
-                            <br>
-                          @endforeach
-                        </td>                       
-                        <td class="text-right">
-                          @foreach($ins->insurance_details as $key => $ins_details)
-                            {{number_format($ins_details->sum_insured,2)}}<br>
-                          @endforeach
-                        </td>
-                        
-                        <td>{{$ins->risk->risk_description ?? ''}}</td>                     
+                        <td>{{$ins->id}}</td>
+                        <td>{{$ins->insurances->agent->agentDesc ?? ''}}</td>
+                        <td>{{$ins->insurances->company->compCode ?? '' }}</td>
+                        <td>{{$ins->insurances->insurance_company->ins_agent_desc ?? ''}}</td>
+                        <td>{{$ins->insurances->ins_class ?? '' }}</td>
+                        <td>{{$ins->insurances->ins_correspond_address ?? ''}}</td>                        
+                        <td>{{$ins->policy_no ?? ''}}</td>  
+                        <td>{{$ins->date_start}} to {{$ins->date_end}}</td>                      
+                        <td class="text-right">{{number_format($ins->sum_insured,2)}}</td>                        
+                        <td>{{$ins->remark}}</td>                                                                 
+                        @if($ins->policy_status == 'active')<td>Active</td>@endif       
+                        @if($ins->policy_status == 'on_hold')<td>On Hold</td>@endif         
+                        @if($ins->policy_status == 'cancelled')<td>Cancelled</td>@endif   
+                        @if($ins->policy_status == 'inactive')<td>Inactive</td>@endif 
+                        @if($ins->payment_status == 'pending')<td style="text-align:center;color:red;">Pending<span><a href="{{ route("admin.payments.create", ['id'=>$ins->insurance_id,'ins_details_id'=>$ins->id]) }}" class="nav-link"><i class="fas fa-hand-holding-usd fa-2x need_payment" style="color:red;"></i></a></span></td>@endif        
+                        @if($ins->payment_status == 'paid')<td style="text-align:center;color:green;">Paid<span><a href="{{ route("admin.payments.show", ['id'=>$ins->insurance_id,'ins_details_id'=>$ins->id]) }}" class="nav-link"><i class="fas fa-file-invoice fa-2x" style="color:green;"></i></a></span></td>@endif                   
                         <td>
                             @can('insurance_show')
-                                <a class="btn btn-xs btn-primary" href="{{ route('admin.insurances.show', $ins->id) }}">
+                                <a class="btn btn-xs btn-primary" href="{{ route('admin.insurances.show', $ins->insurances->id) }}">
                                     {{ trans('global.view') }}
                                 </a>
                             @endcan
 
                             @can('insurance_edit')
-                                <a class="btn btn-xs btn-info" href="{{ route('admin.insurances.edit', $ins->id) }}">
+                                <a class="btn btn-xs btn-info" href="{{ route('admin.insurances.edit', $ins->insurances->id) }}">
                                     {{ trans('global.edit') }}
                                 </a>
                             @endcan
@@ -90,30 +92,29 @@
                                 @php
                                 $mostRecent = 0;
                                 @endphp
-                                @foreach($ins->insurance_details as $key => $ins_details)
-                                    @php
-                                    $curDate = strtotime($ins_details->date_end)
+                                @php
+                                    $curDate = strtotime($ins->date_end)
                                     @endphp
                                     @if($curDate > $mostRecent)
                                         @php
                                         $mostRecent = $curDate;
                                         @endphp
                                     @endif
-                                @endforeach
                                 @php
                                 $today = strtotime(date('Y-m-d'));
                                 $dateDiff = $mostRecent - $today;
                                 $days = round($dateDiff / (60 * 60 * 24));
                                 @endphp
                                 @if($days <=50)
-                                <a class="btn btn-xs btn-warning renew_button" href="{{route('admin.insurances.renew', $ins->id) }}">
+                                <a class="btn btn-xs btn-warning renew_button" href="{{route('admin.insurances.renew', ['id'=>$ins->insurances->id,'ins_details_id'=>$ins->id]) }}">
                                 <i class="fas fa-exclamation-triangle warning_button" style="color:red;"></i> {{ trans('global.renew') }} 
                                 </a>  
-                                @endif   
+                                @endif 
                             @endcan
                         </td>
                     </tr>
                     @endforeach
+                @endif
                 </tbody>
             </table>
         </div>

@@ -24,7 +24,9 @@ class InsuranceController extends Controller
     public function index()
     {
         abort_if(Gate::denies('insurance_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $insurances = Insurance::all();        
+        $insurances = InsuranceDetails::inactive()->latest('date_start')->get();
+        // $insurances = InsuranceDetails::all();
+
         return view('admin.insurances.index', compact('insurances'));
     }
 
@@ -195,7 +197,8 @@ class InsuranceController extends Controller
                 'service_tax' => $value->service_tax,
                 'stamp_duty' => $value->stamp_duty,
                 'date_start' => $value->date_start,
-                'date_end' => $value->date_end,                
+                'date_end' => $value->date_end,  
+                'policy_status' => $value->policy_status,  
             );
                 
         }   
@@ -228,9 +231,17 @@ class InsuranceController extends Controller
             $perils[$risk_id][] = $perils_item;
         }         
         $risk_count = count($arr_risk_id);   
+
+        //policy status array
+        $arr_policy_status = array(
+            'inactive' => 'Inactive',
+            'active' => 'Active',
+            'on_hold' => 'On Hold',
+            'cancelled' => 'Cancelled'
+        );
         //get the lowest and highest tab index  
 
-        return view('admin.insurances.edit', compact('company','agent','insurance','ins_details','current_year','risk','perils','risk_count', 'insuranceCompany'));
+        return view('admin.insurances.edit', compact('company','agent','insurance','ins_details','current_year','risk','perils','risk_count', 'insuranceCompany','arr_policy_status'));
     }
 
     public function update(UpdateInsuranceRequest $request, Insurance $insurance)
@@ -248,7 +259,8 @@ class InsuranceController extends Controller
             'ins_issuing_branch' =>$param['ins_issuing_branch'], 
             'ins_issuing_date' =>$param['ins_issuing_date'] == ''? NULL : $param['ins_issuing_date'], 
             'insurance_comp_id' =>$param['insurance_comp_id'],
-            'updated_at' => date("Y-m-d H:i:s")
+            'updated_at' => date("Y-m-d H:i:s"),
+            
         ];
 
         //update insurance table
@@ -268,6 +280,7 @@ class InsuranceController extends Controller
         $arr_rate = $param['rate'];
         $arr_remark = $param['remark'];
         $arr_excess = $param['excess'];
+        $policy_status = $param['policy_status'];
         foreach ($arr_ins_details_id as $key => $value) {
             # code...
             $insurance_details = [
@@ -281,14 +294,13 @@ class InsuranceController extends Controller
                 'self_rating' => $arr_rate[$key],
                 'remark' => $arr_remark[$key],
                 'excess' => $arr_excess[$key],
+                'policy_status' => $policy_status[$key]
             ];
             
             $affected_insurance_details = DB::table('insurance_details')
                                         ->where('id', $value)
                                         ->update($insurance_details);
         }
-
-
 
         //risk tabs array
         $risk_location = $param['risk_location'];
@@ -409,18 +421,21 @@ class InsuranceController extends Controller
 
         foreach($risk as $key => $value){
             $risk_id = $value->id;  
-            $renewal_item_c = explode(',', $value->item_id);   
+            $renewal_item_c = explode(',', $value->item_id);             
             $perils_item[$value->year] = DB::table('additional_ins_item')->where('risk_id','=', $risk_id)->whereIn('id',$renewal_item_c)->whereNull('deleted_at')->get();
+              
             $perils[$risk_id][] = $perils_item;                        
         }
+        
         $insurance['risk'] = $risk;
         // $insurance['interest_insured'] = $interest_insured;
         $insurance['perils'] = $perils;
-        $insurance['ins_details'] = $ins_details;               
+        $insurance['ins_details'] = $ins_details;       
+        
         return view('admin.insurances.show',compact('insurance'));
     }
 
-    public function destroy(Insurance $insurance)
+    public function destroy(InsuranceDetails $insurance)
     {
         abort_if(Gate::denies('insurance_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 

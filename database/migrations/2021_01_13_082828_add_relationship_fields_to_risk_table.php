@@ -16,7 +16,7 @@ class AddRelationshipFieldsToRiskTable extends Migration
         Schema::table('risk', function (Blueprint $table) {
             $table->unsignedInteger('created_by_id')->nullable();
 
-            $table->foreign('created_by_id', 'created_by_fk_00007')->references('id')->on('users');
+            $table->foreign('created_by_id', 'created_by_fk_00011')->references('id')->on('users');
         });
     }
 }

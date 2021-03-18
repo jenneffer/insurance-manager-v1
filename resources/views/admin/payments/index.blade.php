@@ -1,17 +1,8 @@
 @extends('layouts.admin')
 @section('content')
-@can('company_create')
-    <div style="margin-bottom: 10px;" class="row">
-        <div class="col-lg-12">
-            <a class="btn btn-success" href="{{ route("admin.companies.create") }}">
-                {{ trans('global.add') }} {{ trans('cruds.company.title_singular') }}/Owner
-            </a>
-        </div>
-    </div>
-@endcan
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.company.title_singular') }}/Owner {{ trans('global.list') }}
+        Policy Payment List
     </div>
 
     <div class="card-body">
@@ -21,33 +12,40 @@
                     <tr>
                         <th width="10"></th>
                         <th>Id</th>
-                        <th>Code</th>
-                        <th>Name</th>                        
+                        <th>Policy No</th>
+                        <th>Paid Amount (RM)</th>                        
+                        <th>Payment Date</th>
+                        <th>Payment Mode</th>
+                        <th>Remark</th>
                         <th>Modify</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($company as $key => $comp)
-                        <tr data-entry-id="{{ $comp->id }}">
+                    @foreach($payment as $key => $data)
+                        <tr data-entry-id="{{ $data->id }}">
                             <td></td>
-                            <td>{{ $comp->id }}</td>
-                            <td>{{ $comp->compCode }}</td>
-                            <td>{{ $comp->compDesc }}</td>                            
+                            <td>{{ $data->id }}</td>
+                            <td>{{ $data->policy_no }}</td>
+                            <td>{{ number_format($data->paid_amount,2) }}</td>    
+                            <td>{{ $data->payment_date }}</td>   
+                            @if( $data->payment_mode == 'payment_company')<td>Payment by Company</td>@endif   
+                            @if( $data->payment_mode == 'cash_individual')<td>Individual Cash</td>@endif   
+                            <td>{{ $data->remark}}</td>                           
                             <td>
-                                @can('company_show')
-                                    <a class="btn btn-xs btn-primary" href="{{ route('admin.companies.show', $comp->id) }}">
+                                @can('payment_show')
+                                    <a class="btn btn-xs btn-primary" href="{{ route('admin.payments.show', ['id'=>$data->insurance_id,'ins_details_id'=>$data->insurance_details_id]) }}">
                                         {{ trans('global.view') }}
                                     </a>
                                 @endcan
 
-                                @can('company_edit')
-                                    <a class="btn btn-xs btn-info" href="{{ route('admin.companies.edit', $comp->id) }}">
+                                @can('payment_edit')
+                                    <a class="btn btn-xs btn-info" href="{{ route('admin.payments.edit', $data->id) }}">
                                         {{ trans('global.edit') }}
                                     </a>
                                 @endcan
 
-                                @can('company_delete')
-                                    <form action="{{ route('admin.companies.destroy', $comp->id) }}" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
+                                @can('payment_delete')
+                                    <form action="{{ route('admin.payments.destroy', $data->id) }}" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
                                         <input type="hidden" name="_method" value="DELETE">
                                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                         <input type="submit" class="btn btn-xs btn-danger" value="{{ trans('global.delete') }}">
@@ -71,11 +69,11 @@
 <script>
     $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-@can('company_delete')
+@can('payment_delete')
   let deleteButtonTrans = '{{ trans('global.datatables.delete') }}'
   let deleteButton = {
     text: deleteButtonTrans,
-    url: "{{ route('admin.companies.massDestroy') }}",
+    url: "{{ route('admin.payments.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
       var ids = $.map(dt.rows({ selected: true }).nodes(), function (entry) {

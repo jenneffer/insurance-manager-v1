@@ -66,7 +66,12 @@ $tabContent = "<div class='row form-group'>
     <div class="card-body">
         <form name='InsuranceRenewalForm' id='InsuranceRenewalForm'>
             <input type='hidden' id='perils' name='perils' value=''>
-            @csrf            
+            @csrf    
+            <div class="row form-group">
+                <div class="col-sm-6">
+                    <label for="ins_policy_no" class="text-muted">Previous Policy No. : </label><span class="text-muted"> {{$prevPolicyNo}}</span>                    
+                </div> 
+            </div>        
             <div class="row form-group">
                 <div class="col-sm-6">
                     <label for="ins_policy_no">Policy No. <span style="color:red;">*</span></label>

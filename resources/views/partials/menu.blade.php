@@ -70,7 +70,7 @@
                         <i class="fa-fw fas fa-building nav-icon">
 
                         </i>
-                        {{ trans('cruds.company.title') }}
+                        {{ trans('cruds.company.title') }}/Owner
                     </a>
                 </li>
             @endcan
@@ -81,6 +81,14 @@
 
                         </i>
                         {{ trans('cruds.insurance.title') }}
+                    </a>
+                </li>
+            @endcan
+            @can('payment_access')
+                <li class="nav-item">
+                    <a href="{{ route("admin.payments.index") }}" class="nav-link {{ request()->is('admin/payments') || request()->is('admin/payments/*') ? 'active' : '' }}">
+                        <i class="fas fa-file-invoice-dollar nav-icon"></i>
+                        Payment
                     </a>
                 </li>
             @endcan
