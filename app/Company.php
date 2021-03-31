@@ -31,6 +31,11 @@ class Company extends Model
         return $this->hasMany(Insurance::class, 'ins_company', 'id');
     }
 
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'company_id', 'id');
+    }
+
     public function created_by()
     {
         return $this->belongsTo(User::class, 'created_by_id');

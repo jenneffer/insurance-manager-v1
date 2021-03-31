@@ -1,5 +1,14 @@
 @extends('layouts.admin')
 @section('content')
+@can('payment_create')
+    <div style="margin-bottom: 10px;" class="row">
+        <div class="col-lg-12">
+            <a class="btn btn-success" href="{{ route("admin.payments.create") }}">
+                Add Payment
+            </a>
+        </div>
+    </div>
+@endcan
 <div class="card">
     <div class="card-header">
         Policy Payment List
@@ -12,7 +21,7 @@
                     <tr>
                         <th width="10"></th>
                         <th>Id</th>
-                        <th>Policy No</th>
+                        <th>Company</th>
                         <th>Paid Amount (RM)</th>                        
                         <th>Payment Date</th>
                         <th>Payment Mode</th>
@@ -25,25 +34,19 @@
                         <tr data-entry-id="{{ $data->id }}">
                             <td></td>
                             <td>{{ $data->id }}</td>
-                            <td>{{ $data->policy_no }}</td>
+                            <td>{{ $data->company->compCode}}</td>
                             <td>{{ number_format($data->paid_amount,2) }}</td>    
                             <td>{{ $data->payment_date }}</td>   
                             @if( $data->payment_mode == 'payment_company')<td>Payment by Company</td>@endif   
                             @if( $data->payment_mode == 'cash_individual')<td>Individual Cash</td>@endif   
                             <td>{{ $data->remark}}</td>                           
                             <td>
+                                
                                 @can('payment_show')
-                                    <a class="btn btn-xs btn-primary" href="{{ route('admin.payments.show', ['id'=>$data->insurance_id,'ins_details_id'=>$data->insurance_details_id]) }}">
+                                    <a class="btn btn-xs btn-primary" href="{{ route('admin.payments.show', $data->id) }}">
                                         {{ trans('global.view') }}
                                     </a>
                                 @endcan
-
-                                @can('payment_edit')
-                                    <a class="btn btn-xs btn-info" href="{{ route('admin.payments.edit', $data->id) }}">
-                                        {{ trans('global.edit') }}
-                                    </a>
-                                @endcan
-
                                 @can('payment_delete')
                                     <form action="{{ route('admin.payments.destroy', $data->id) }}" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
                                         <input type="hidden" name="_method" value="DELETE">

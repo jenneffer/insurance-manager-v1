@@ -15,9 +15,9 @@ class CreatePolicyPaymentTable extends Migration
     {
         Schema::create('policy_payment', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('insurance_id');
-            $table->string('policy_no', 50);
-            $table->integer('insurance_details_id');
+            $table->integer('company_id');
+            $table->string('payment_to', 225);
+            $table->string('payment_mode', 25); 
             $table->float('paid_amount', 15, 2);
             $table->text('remark');
             $table->date('payment_date');            

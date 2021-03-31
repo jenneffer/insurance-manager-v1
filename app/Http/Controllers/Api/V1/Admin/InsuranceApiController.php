@@ -11,7 +11,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class InsuranceController extends Controller
+class InsuranceApiController extends Controller
 {
     public function index()
     {

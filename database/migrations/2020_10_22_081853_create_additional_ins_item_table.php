@@ -15,6 +15,7 @@ class CreateAdditionalInsItemTable extends Migration
     {
         Schema::create('additional_ins_item', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer('ins_id');
             $table->integer('risk_id');
             $table->string('ref_no', 25);
             $table->text('description');

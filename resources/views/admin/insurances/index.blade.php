@@ -65,8 +65,8 @@
                         @if($ins->policy_status == 'on_hold')<td>On Hold</td>@endif         
                         @if($ins->policy_status == 'cancelled')<td>Cancelled</td>@endif   
                         @if($ins->policy_status == 'inactive')<td>Inactive</td>@endif 
-                        @if($ins->payment_status == 'pending')<td style="text-align:center;color:red;">Pending<span><a href="{{ route("admin.payments.create", ['id'=>$ins->insurance_id,'ins_details_id'=>$ins->id]) }}" class="nav-link"><i class="fas fa-hand-holding-usd fa-2x need_payment" style="color:red;"></i></a></span></td>@endif        
-                        @if($ins->payment_status == 'paid')<td style="text-align:center;color:green;">Paid<span><a href="{{ route("admin.payments.show", ['id'=>$ins->insurance_id,'ins_details_id'=>$ins->id]) }}" class="nav-link"><i class="fas fa-file-invoice fa-2x" style="color:green;"></i></a></span></td>@endif                   
+                        @if($ins->payment_status == 'pending')<td style="text-align:center;color:red;">Pending</td>@endif        
+                        @if($ins->payment_status == 'paid')<td style="text-align:center;color:green;">Paid</td>@endif                   
                         <td>
                             @can('insurance_show')
                                 <a class="btn btn-xs btn-primary" href="{{ route('admin.insurances.show', $ins->insurances->id) }}">

@@ -19,22 +19,23 @@ class Payment extends Model
     ];
 
     protected $fillable = [
-        'insurance_details_id',
-        'insurance_id',
-        'policy_no',        
+        'company_id',
+        'payment_to',       
         'paid_amount',
         'remark',
         'payment_date',
         'payment_mode'
     ];
 
-    public function insurances()
-    {
-        return $this->hasMany(Insurance::class, 'id', 'ins_id');
-    }
     public function insurancesDetails()
     {
-        return $this->belongsTo(InsuranceDetails::class, 'insurance_details_id','id');
+        return $this->hasMany(InsuranceDetails::class, 'payment_id', 'id');
     }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id');       
+    }
+    
 
 }

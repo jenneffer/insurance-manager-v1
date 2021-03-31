@@ -68,8 +68,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     //payments
     Route::delete('payments/destroy', 'PaymentController@massDestroy')->name('payments.massDestroy');     
-    Route::resource('payments', 'PaymentController');
-    Route::get('/payments/create/{id}/{ins_details_id}','PaymentController@create')->name('payments.create');
-    Route::get('/payments/show/{id}/{ins_details_id}','PaymentController@show')->name('payments.show');
+    Route::resource('payments', 'PaymentController');    
+    Route::post('/payments/filter','PaymentController@filter')->name('payments.filter');
+    Route::post('/payments/create_payment','PaymentController@create_payment')->name('payments.create_payment');
+    Route::post('/payments/add', 'PaymentController@store')->name('payments.store');
+    
 
 });

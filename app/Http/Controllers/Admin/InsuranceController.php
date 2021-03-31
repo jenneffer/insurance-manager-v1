@@ -25,6 +25,7 @@ class InsuranceController extends Controller
     {
         abort_if(Gate::denies('insurance_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $insurances = InsuranceDetails::inactive()->latest('date_start')->get();
+        
         // $insurances = InsuranceDetails::all();
 
         return view('admin.insurances.index', compact('insurances'));

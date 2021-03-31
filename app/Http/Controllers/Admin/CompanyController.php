@@ -75,4 +75,9 @@ class CompanyController extends Controller
 
         return response(null, Response::HTTP_NO_CONTENT);
     }
+
+    public static function getCompanyName($comp_id){
+        $results = Company::where(['id' => $comp_id])->first();
+        return $results;
+    }
 }

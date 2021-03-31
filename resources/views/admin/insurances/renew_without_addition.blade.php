@@ -61,14 +61,14 @@
         $('#InsuranceRenewalForm').on('submit',function(event){           
             event.preventDefault();
             var insuranceData = $('#InsuranceRenewalForm').serialize();    
-            var insurance_details_id = {!! json_encode($ins_details_id) !!};        
+            var ins_id = {!! json_encode($ins_id) !!};        
             $.ajax({
                 url: "/admin/insurance/update_renewal",
                 type:"POST",               
                 data:{
                     "_token": "{{ csrf_token() }}",
                     data: insuranceData,
-                    ins_details_id: insurance_details_id                    
+                    ins_id: ins_id                    
                 },                
                 success:function(response){
                     window.location=response.url;

@@ -56,15 +56,15 @@
                                     {{ trans('global.login') }}
                                 </button>
                             </div>
-                            <!-- <div class="col-6 text-right">
+                            <div class="col-6 text-right">
                                 <a class="btn btn-link px-0" href="{{ route('password.request') }}">
                                     {{ trans('global.forgot_password') }}
                                 </a>
                                 <br>
-                                <a class="btn btn-link px-0" href="{{ route('register') }}">
+                                <!-- <a class="btn btn-link px-0" href="{{ route('register') }}">
                                     {{ trans('global.register') }}
-                                </a>
-                            </div> -->
+                                </a> -->
+                            </div>
                         </div>
                     </form>
                 </div>

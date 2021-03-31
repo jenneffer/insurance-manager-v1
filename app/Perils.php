@@ -22,6 +22,7 @@ class Perils extends Model
     ];
 
     protected $fillable = [
+        'ins_id',
         'risk_id',
         'ref_no',
         'description',

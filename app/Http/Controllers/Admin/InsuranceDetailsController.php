@@ -67,6 +67,17 @@ class InsuranceDetailsController extends Controller
         ];
         //insert into insurance details table
         $insurance = InsuranceDetails::create($insurance_renew); //create model insurancerenew besok
+        $ds_year = date('Y', strtotime($param['ins_date_start']));
+        //get the risk_id of previous policy insurance in renewal_item_controller - last year punya 
+        $lastYear = date("Y", strtotime("-1 years"));
+        $risk_id = $this->getRiskIDPreviousRenewal($lastYear, $ins_id);
+        
+        DB::table('renewal_item_controller')->insert([
+            'ins_id' => $ins_id,
+            'year' =>$ds_year,
+            'risk_id' => $risk_id,
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
         return response()->json(['url'=>url('/admin/insurances')]);  
     }
 
@@ -83,8 +94,9 @@ class InsuranceDetailsController extends Controller
             'date_start' => $param['ins_date_start'], 
             'date_end' => $param['ins_date_end'], 
             'remark' => $param['ins_remark'],               
-        ];                
-        //insert into insurance details table
+        ];    
+                   
+        //insert into insurance details table 
         $insurance = InsuranceDetails::create($insurance_renew); 
         
         //additional risk
@@ -107,7 +119,7 @@ class InsuranceDetailsController extends Controller
 
         
 
-        //additional item 
+        // additional item 
         $perils = json_decode($param['perils']);      
         $additional_items_id = [];
         $risk_id = "";  //will fix later if the tab involve is more than 1  
@@ -116,6 +128,7 @@ class InsuranceDetailsController extends Controller
             foreach ($value as $risk_tab_id => $risk_data_perils) {
                 # code...
                 $perilsData = array(
+                        'ins_id' => $ins_id,
                         'risk_id' => $risk_tab_id,
                         'ref_no' => $risk_data_perils->ins_code,
                         'description' => $risk_data_perils->ins_desc_perils,
@@ -125,7 +138,7 @@ class InsuranceDetailsController extends Controller
                     );
 
                 $perils = Perils::create($perilsData);
-
+                
                 //kumpul id utk dimasukkan dalam table renewal_item_controller based on the current year
                 //get the last insert id
                 $lastInsertID = $perils->id;
@@ -161,5 +174,10 @@ class InsuranceDetailsController extends Controller
     public static function getPolicyNumber($ins_details_id){
         $result = DB::table('insurance_details')->select('policy_no')->where('id', $ins_details_id)->first();           
         return $result->policy_no;     
+    }
+
+    public static function getRiskIDPreviousRenewal($lastYear, $ins_id){
+        $result = DB::table('renewal_item_controller')->select('risk_id')->where('ins_id', $ins_id)->where('year', $lastYear)->first();           
+        return $result->risk_id;  
     }
 }

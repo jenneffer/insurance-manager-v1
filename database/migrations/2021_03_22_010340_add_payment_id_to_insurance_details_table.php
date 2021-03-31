@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPaymentModeToPolicyPaymentTable extends Migration
+class AddPaymentIdToInsuranceDetailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddPaymentModeToPolicyPaymentTable extends Migration
      */
     public function up()
     {
-        Schema::table('policy_payment', function (Blueprint $table) {
-            $table->string('payment_mode', 25); 
+        Schema::table('insurance_details', function (Blueprint $table) {
+            $table->integer('payment_id');
         });
     }
 
@@ -25,7 +25,7 @@ class AddPaymentModeToPolicyPaymentTable extends Migration
      */
     public function down()
     {
-        Schema::table('policy_payment', function (Blueprint $table) {
+        Schema::table('insurance_details', function (Blueprint $table) {
             //
         });
     }

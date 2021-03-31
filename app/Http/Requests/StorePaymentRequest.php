@@ -18,10 +18,7 @@ class StorePaymentRequest extends FormRequest
 
     public function rules()
     {
-        return [             
-            'policy_no' => [
-                'required',
-            ],            
+        return [                        
             'paid_amount' => [
                 'required',
             ],

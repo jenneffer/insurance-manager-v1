@@ -174,7 +174,7 @@ table.dataTable thead .sorting_desc {
 
 .table-1 {
     border-collapse:separate;
-    border-spacing: 10px;
+    border-spacing: 8px;
 }
 .table-content {
     border: 1px solid black;
@@ -211,7 +211,7 @@ table.dataTable thead .sorting_desc {
 @media print {
 body { 
     font-size: 16pt;
-    margin: 0px; 
+    margin: 0mm 0mm 0mm 0mm; 
     }
 }
 @media screen {
