@@ -29,6 +29,7 @@ class InsuranceDetails extends Model
         'date_end',
         'sum_insured',        
         'remark',
+        'created_by_id'
     ];
     public function insurances()
     {

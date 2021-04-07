@@ -34,7 +34,7 @@ class AttachmentController extends Controller
     public function create()
     {
         abort_if(Gate::denies('attachment_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $insurance_policy = InsuranceDetails::all()->pluck('policy_no', 'id')->prepend(trans('global.pleaseSelect'), '');        
+        $insurance_policy = InsuranceDetails::where('policy_status','active')->pluck('policy_no', 'id')->prepend(trans('global.pleaseSelect'), '');        
     
         return view('admin.attachments.create', compact('insurance_policy'));
     }

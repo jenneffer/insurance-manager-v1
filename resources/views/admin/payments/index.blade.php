@@ -36,9 +36,9 @@
                             <td>{{ $data->id }}</td>
                             <td>{{ $data->company->compCode}}</td>
                             <td>{{ number_format($data->paid_amount,2) }}</td>    
-                            <td>{{ $data->payment_date }}</td>   
+                            <td>{{ date('d-m-Y', strtotime($data->payment_date)) }}</td>   
                             @if( $data->payment_mode == 'payment_company')<td>Payment by Company</td>@endif   
-                            @if( $data->payment_mode == 'cash_individual')<td>Individual Cash</td>@endif   
+                            @if( $data->payment_mode == 'cash_individual')<td>Cash</td>@endif   
                             <td>{{ $data->remark}}</td>                           
                             <td>
                                 

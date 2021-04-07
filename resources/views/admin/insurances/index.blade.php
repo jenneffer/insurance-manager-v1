@@ -58,7 +58,7 @@
                         <td>{{$ins->insurances->ins_class ?? '' }}</td>
                         <td>{{$ins->insurances->ins_correspond_address ?? ''}}</td>                        
                         <td>{{$ins->policy_no ?? ''}}</td>  
-                        <td>{{$ins->date_start}} to {{$ins->date_end}}</td>                      
+                        <td>{{date('d-m-Y', strtotime($ins->date_start))}} to {{date('d-m-Y', strtotime($ins->date_end))}}</td>                      
                         <td class="text-right">{{number_format($ins->sum_insured,2)}}</td>                        
                         <td>{{$ins->remark}}</td>                                                                 
                         @if($ins->policy_status == 'active')<td>Active</td>@endif       

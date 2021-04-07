@@ -60,7 +60,8 @@ class InsuranceController extends Controller
             'ins_issuing_branch' =>$param['ins_issuing_branch'], 
             'ins_issuing_date' =>$param['ins_issuing_date'],             
             'ins_mortgagee' => $param['ins_mortgagee'], 
-            'insurance_comp_id' => $param['insurance_comp_id']           
+            'insurance_comp_id' => $param['insurance_comp_id'],
+            'created_by_id' => $request->user()->id           
         ];
         //insert into insurance table
         $insurance = Insurance::create($insurance_table);
@@ -80,7 +81,8 @@ class InsuranceController extends Controller
             'sum_insured' =>$param['ins_total_sum_insured'] == '' ? 0 : $param['ins_total_sum_insured'], 
             'self_rating' => $param['ins_self_rating'],
             'excess' => $param['ins_excess'],
-            'remark' => $param['ins_remark']
+            'remark' => $param['ins_remark'],
+            'created_by_id' => $request->user()->id
         ];
         $insurance_details = InsuranceDetails::create($insurance_details_table);
 
@@ -129,6 +131,7 @@ class InsuranceController extends Controller
                     # code...
                     if($i == $risk_tab_id ){
                         $perilsData = array(
+                            'ins_id' => $insurance_details->insurance_id,
                             'risk_id' => $riskLastInsertID,
                             'ref_no' => $risk_data_perils->ins_code,
                             'description' => $risk_data_perils->ins_desc_perils,

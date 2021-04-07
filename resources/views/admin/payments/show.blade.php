@@ -51,10 +51,12 @@
             </tr>
             @php
             $count = 0;
+            $gtotal = 0;
             @endphp
             @foreach($construtedData['insurance_details'] as $data)
             @php
             $count++;
+            $gtotal +=$data['sum_insured'];
             @endphp
             <tr>
                 <td class="table-content text-center">{{$count}}.</td>
@@ -68,9 +70,14 @@
                 <td class="table-content text-right">{{number_format($data['sum_insured'],2)}}</td>
                 <!-- <td class="table-content">&nbsp;</td> -->
             </tr>            
-            @endforeach     
+            @endforeach 
             <tr>
-                <th class="table-content">Total</th>
+                <td></td>
+                <th class="table-content text-right">Total Sum Insured (RM)</th>
+                <th class="table-content text-right">{{number_format($gtotal,2)}}</th>
+            </tr>    
+            <tr>
+                <th class="table-content text-center">Total</th>
                 <th class="table-content">{{$moneyText}} Only</th>
                 <th class="table-content text-right">{{number_format($construtedData['paid_amount'],2)}}</th>
             </tr>       

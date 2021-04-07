@@ -24,7 +24,8 @@ class Payment extends Model
         'paid_amount',
         'remark',
         'payment_date',
-        'payment_mode'
+        'payment_mode',
+        'created_by_id'
     ];
 
     public function insurancesDetails()

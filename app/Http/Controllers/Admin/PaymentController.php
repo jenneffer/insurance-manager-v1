@@ -54,7 +54,7 @@ class PaymentController extends Controller
         $data = $request->all();
         $param = array();
         parse_str($data['data'], $param); //unserialize jquery string data  
- 
+
         $paymentData = array(
             'company_id' => isset($param['company_id']) ? $param['company_id'] : "",
             'payment_to' => isset($param['payment_to']) ? $param['payment_to'] : "",
@@ -62,7 +62,8 @@ class PaymentController extends Controller
             'paid_amount' => isset($param['paid_amount']) ? (double)$param['paid_amount'] : 0,
             'remark' => isset($param['remark']) ? $param['remark'] : "",
             'payment_date' => isset($param['payment_date']) ? $param['payment_date'] : "",            
-            'created_at' => date('Y-m-d H:i:s')
+            'created_at' => date('Y-m-d H:i:s'),
+            'created_by_id' => $request->user()->id
         );
         
         $payment = Payment::create($paymentData);
@@ -106,13 +107,8 @@ class PaymentController extends Controller
     {                
         abort_if(Gate::denies('payment_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        //get user session
-        $sessionName = new UsersController();
-        $user = $sessionName->getUsernameSession($request->user()->id);
-      
-
         $paymentData = DB::table('insurance_details')
-        ->select(['insurances.ins_class','insurance_details.policy_no', 'insurance_details.date_start', 'insurance_details.sum_insured','insurance_details.date_end', 'risk.risk_location', 'risk.risk_description', 'company.compDesc','policy_payment.payment_to','policy_payment.paid_amount', 'policy_payment.remark', 'policy_payment.payment_date', 'policy_payment.created_at', 'policy_payment.payment_mode'])
+        ->select(['insurances.ins_class','insurance_details.policy_no', 'insurance_details.date_start', 'insurance_details.sum_insured','insurance_details.date_end', 'risk.risk_location', 'risk.risk_description', 'company.compDesc','policy_payment.payment_to','policy_payment.paid_amount', 'policy_payment.remark', 'policy_payment.payment_date', 'policy_payment.created_at', 'policy_payment.payment_mode','policy_payment.created_by_id'])
         ->join('insurances', 'insurances.id', '=', 'insurance_details.insurance_id')
         ->join('risk', 'risk.ins_id', '=', 'insurance_details.insurance_id')
         ->join('policy_payment', 'policy_payment.id', '=', 'insurance_details.payment_id')
@@ -129,6 +125,7 @@ class PaymentController extends Controller
             $payment_date = $data->payment_date;
             $paid_amount = $data->paid_amount;
             $payment_mode = $data->payment_mode;
+            $created_by = $data->created_by_id;
 
             $insData[] = [
                 'ins_class' => $data->ins_class,
@@ -150,6 +147,9 @@ class PaymentController extends Controller
             'payment_mode' => $payment_mode,
             'insurance_details' => $insData
         ];
+        //get username of payment creator 
+        $sessionName = new UsersController();
+        $user = $sessionName->getUsernameSession($created_by);
         $moneyText = $this->numberTowords($paid_amount);
         return view('admin.payments.show', compact('construtedData','user','moneyText'));
     }
@@ -255,7 +255,7 @@ class PaymentController extends Controller
 
             $data = array (
                 "",
-                $count,
+                $count.".",
                 "<span>Classification : ".$clasification."</span><br><span>Policy No. : ".$policy_no."</span><br><span>Period of Insurance : ".$date_start." to ".$date_end."</span><br><span> Location : ".$risk_location."</span><br><span>Property Insured : ".$risk_description."</span>",
                 number_format($sum_insured,2)            
             );
